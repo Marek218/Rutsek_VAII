@@ -2,7 +2,7 @@
 
 /** @var \Framework\Support\LinkGenerator $link */
 ?>
-<link rel="stylesheet" href="<?= $link->asset('css/root.css') ?>">
+
 <div class="container-fluid">
     <div class="row">
         <div class="col mt-5">
@@ -14,7 +14,7 @@
     </div>
     <div class="row mt-3">
         <div class="col text-center">
-        <button class="btn btn-primary btn-lg" onclick="location.href='<?= $link->url('home.contact') ?>'">
+        <button class="btn" onclick="location.href='<?= $link->url('home.contact') ?>'">
             Objednaj sa teraz
         </button>
         </div>
