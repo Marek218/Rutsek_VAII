@@ -9,11 +9,11 @@
         <h1>
             Naše služby
         </h1>
-    </div>
+            </div>
 </div>
 <div class="rect-grid">
-    <div class="rect">TU BUDE KONTAKT</div>
-</div>
+    <div class="rect">TU BUDE SLUZBY</div>
+    </div>
 <div class="row mt-3">
     <div class="col">
 

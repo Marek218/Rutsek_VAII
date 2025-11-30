@@ -52,6 +52,26 @@ class HomeController extends BaseController
      */
     public function contact(Request $request): Response
     {
+        // Render the original contact view again.
         return $this->html();
     }
+
+    /**
+     * Displays the about page.
+     *
+     * @return Response The response object containing the rendered HTML for the about page.
+     */
+    public function about(Request $request): Response
+    {
+        return $this->html();
+    }
+    public function order(Request $request): Response
+    {
+        return $this->html();
+    }
+    public function services(Request $request): Response
+    {
+        return $this->html();
+    }
+
 }

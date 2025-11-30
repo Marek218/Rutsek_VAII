@@ -7,20 +7,15 @@
 <div class="row">
     <div class="col">
         <h1>
-            Naše služby
+            O nás
         </h1>
     </div>
 </div>
 <div class="rect-grid">
-    <div class="rect">TU BUDE KONTAKT</div>
+    <div class="rect">TU SA BUDES MOCT OBJEDNAT</div>
 </div>
 <div class="row mt-3">
     <div class="col">
-
-    </div>
-</div>
-<div class="row mt-3">
-    <div class="col">
-        <a href="<?= $link->url("home.index") ?>">Back to main page</a>
+        <a href="<?= $link->url("home.index") ?>">Späť na hlavnú stránku</a>
     </div>
 </div>

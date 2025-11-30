@@ -32,8 +32,18 @@
         </a>
         <ul class="navbar-nav me-auto">
             <li class="nav-item">
-                <a class="nav-link" href="<?= $link->url('home.contact') ?>">Contact</a>
+                <a class="nav-link" href="<?= $link->url('home.about') ?>">About</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= $link->url('home.services') ?>">Naše služby</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= $link->url('home.order') ?>">Objednať ONLINE</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a>
+            </li>
+
         </ul>
         <?php if ($user->isLoggedIn()) { ?>
             <span class="navbar-text">Logged in user: <b><?= $user->getName() ?></b></span>

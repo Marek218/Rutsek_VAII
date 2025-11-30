@@ -17,10 +17,11 @@ h1 {
     max-height: 40px; /* smaller logo */
     width: auto;
 }
-
+/* Navbar background color */
 .navbar {
     background: linear-gradient(135deg, #191a2e 0%, #191a2e 100%);
 }
+/*horne tlacidla na hornej liste*/
 a.nav-link {
     color: #ffffff !important;
     text-decoration: none;
