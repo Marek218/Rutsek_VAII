@@ -61,15 +61,19 @@ class HomeController extends BaseController
      *
      * @return Response The response object containing the rendered HTML for the about page.
      */
-    public function about(Request $request): Response
+    public function about(): Response
     {
         return $this->html();
     }
-    public function order(Request $request): Response
+    public function order(): Response
     {
         return $this->html();
     }
-    public function services(Request $request): Response
+    public function services(): Response
+    {
+        return $this->html();
+    }
+    public function gallery(): Response
     {
         return $this->html();
     }

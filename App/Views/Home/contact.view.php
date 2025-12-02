@@ -2,8 +2,6 @@
 
 /** @var \Framework\Support\LinkGenerator $link */
 ?>
-
-<link rel="stylesheet" href="<?= $link->asset('css/services.css') ?>?v=<?= time() ?>">
 <div class="row">
     <div class="col">
         <h1>

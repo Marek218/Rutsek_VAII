@@ -1,0 +1,436 @@
+/* Development  - loaded after styl.css to provide quick dev overrides */
+
+/* Full page background and remove default body margin so background covers whole page */
+html, body {
+    height: 100%;
+    margin: 0;
+    /* white to warm-cream background */
+    background: linear-gradient(135deg, #ffffff 0%, #fff7e6 100%);
+    color: #2b2b2b; /* dark gray text for readability */
+}
+
+/* Tweak heading for services to match screenshot */
+h1 {
+    padding: 0.25rem;
+    color: #e3618e; /* pink accent */
+    background: transparent;
+    text-align: center; /* center the title */
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1.25rem;
+}
+
+/* Make the logo (img inside .navbar-brand) smaller */
+.navbar-brand img {
+    max-height: 40px; /* smaller logo */
+    width: auto;
+}
+/* Navbar background color - cream */
+.navbar {
+    background: linear-gradient(135deg, #fdfdfd 0%, #fdfdfd 100%);
+    box-shadow: 0 1px 4px rgba(43, 43, 43, 0.06);
+}
+/*horne tlacidla na hornej liste*/
+a.nav-link {
+    color: #2b2b2b !important;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.2s, color 0.2s;
+}
+a.nav-link:hover, a.nav-link:focus {
+    color: #c85472 !important;
+    border-bottom: 2px solid #c85472;
+}
+.container-fluid {
+}
+.web-content {
+    color: #2b2b2b;
+    /* content area stays clean on cream/white background */
+}
+.btn {
+    background-color: #ff6b9e; /* pink button background */
+    color: #ffffff; /* white button text */
+    border: none; /* remove border */
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 107, 158, 0.18);
+    background-color: #ff4f84; /* slightly darker pink on hover */
+}
+/* Keep this utility available but commented out to avoid overriding colors globally */
+/*
+* {
+    outline: 1px dashed rgba(0,0,0,0.03);
+}
+*/
+/*styl pre cennik v maine*/
+.row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.box {
+    /* removed fixed height: 120px; to allow content-driven height */
+    box-sizing: border-box;
+    flex: 1 1 260px; /* flexible base width */
+    min-height: 220px; /* ensure enough vertical space for icon + title + description */
+    height: auto;
+    background-color: #fff7e6; /* cream */
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: #2b2b2b;
+    border: 1px solid #000; /* thin black border as requested */
+}
+
+/* Make .row containing .box behave as a wrapping flex container for the index page */
+.container-fluid > .row .row {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* Box tile: responsive, fixed min size but grows, vertical layout */
+.box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 220px;
+    max-width: 320px;
+    flex: 1 1 260px; /* flexible base width */
+    padding: 1.25rem;
+    background: #fff; /* keep white to contrast with cream background */
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(43,43,43,0.04);
+    border: 1px solid #000; /* thin black border as requested */
+    text-align: center;
+    box-sizing: border-box; /* include padding when calculating min-height */
+    min-height: 220px; /* make sure tile is tall enough to show full text */
+    height: auto;
+}
+
+.box .service-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 0.8rem;
+}
+
+.box h3 {
+    margin: 0.3rem 0 0.5rem 0;
+    font-size: 1.05rem;
+    color: #c85472;
+}
+
+.box .service-desc {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Make boxes slightly larger on wider screens */
+@media (min-width: 992px) {
+    .box {
+        padding: 1.5rem;
+    }
+    .box .service-icon {
+        width: 72px;
+        height: 72px;
+    }
+}
+
+/* Ensure good stacking on very small screens */
+@media (max-width: 480px) {
+    .box {
+        min-width: 100%;
+        max-width: 100%;
+        flex-basis: 100%;
+    }
+}
+
+/* Services grid styles to match the provided layout (4 columns on wide screens) */
+.services-section {
+    padding: 3.5rem 1rem;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem 3.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.service-item {
+    text-align: center; /* center the title and description */
+    padding: 0.5rem 0.5rem;
+}
+
+.service-icon {
+    color: #c85472; /* muted pink for the icons */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+/* Ensure images used as icons are sized and centered */
+.service-item .service-icon {
+    display: block;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    filter: none; /* keep original icon colors unless the icon is SVG that inherits color */
+}
+
+.service-item h3 {
+    margin: 0 0 0.5rem 0;
+    color: #c85472; /* heading pink */
+    font-size: 1.05rem;
+}
+
+.service-desc {
+    margin: 0;
+    color: #6b6b6b; /* subdued gray for description */
+    font-size: 0.85rem;
+}
+
+/* Responsive: 3 columns on medium-large screens */
+@media (max-width: 1200px) {
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Responsive: 2 columns on tablet */
+@media (max-width: 992px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    .service-item {
+        text-align: center; /* center items on narrower screens */
+    }
+    .service-icon {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Responsive: 1 column on small screens */
+@media (max-width: 576px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+    .service-item {
+        text-align: center;
+    }
+    .service-icon {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Footer styles (more compact) */
+.site-footer {
+    background: linear-gradient(180deg, #f9e9ec 0%, #f7e6e9 100%);
+    color: #4a2b2b;
+    padding: 0.6rem 0; /* even smaller vertical padding */
+    margin-top: 0.8rem; /* reduce space above footer */
+    font-size: 0.92rem;
+}
+
+/* align columns side-by-side and distribute space evenly */
+.site-footer .container > .row {
+    display: flex;
+    flex-wrap: nowrap; /* prefer side-by-side on wide screens */
+    align-items: center; /* vertical centering of columns */
+    gap: 0.75rem 2rem;
+}
+
+.site-footer .col-md-4 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+    flex: 1 1 0; /* distribute columns evenly */
+    min-width: 200px; /* allow wrapping on narrow screens */
+}
+
+.site-footer h5 {
+    color: #a93b5d;
+    margin: 0 0 0.2rem 0;
+    font-size: 0.98rem;
+}
+
+.site-footer p {
+    color: #5a4a4a;
+    margin: 0 0 0.2rem 0;
+    font-size: 0.82rem;
+}
+
+.site-footer .list-unstyled {
+    margin: 0; /* remove extra spacing from quick links */
+    padding: 0;
+}
+
+.site-footer .list-unstyled li {
+    margin-bottom: 0.18rem;
+}
+
+.site-footer .footer-link {
+    color: #6b3d4f;
+    text-decoration: none;
+    font-size: 0.88rem;
+}
+.site-footer .footer-link:hover {
+    color: #c85472;
+    text-decoration: underline;
+}
+
+.site-footer .footer-separator {
+    border: none;
+    border-top: 1px solid rgba(200,180,175,0.16);
+    margin: 0.45rem 0; /* tighter spacing */
+}
+
+.site-footer .footer-copy {
+    color: #6b3d4f;
+    font-size: 0.76rem; /* smaller copyright */
+    padding: 0.15rem 0 0 0;
+}
+
+@media (max-width: 900px) {
+    /* allow wrapping under tablet width */
+    .site-footer .container > .row {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 767px) {
+    /* stack columns on small screens but keep smaller vertical spacing */
+    .site-footer {
+        padding: 0.6rem 0;
+    }
+    .site-footer .container > .row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+    .site-footer .col-md-4 {
+        width: 100%;
+    }
+}
+
+/* Action row: buttons with separator */
+.action-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.action-row .btn {
+    padding: 0.55rem 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.action-separator {
+    width: 1px;
+    height: 34px;
+    background: rgba(200,180,175,0.45);
+    display: inline-block;
+    border-radius: 2px;
+}
+
+/* Services title */
+.services-title {
+    font-size: 1.75rem;
+    color: #c85472;
+    margin: 1.25rem 0 1rem 0;
+    font-weight: 700;
+    position: relative;
+}
+.services-title::before {
+    content: '';
+    display: block;
+    width: 90px;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(200,120,140,0.9), rgba(255,107,158,0.9));
+    margin: 0 auto 0.6rem auto;
+    border-radius: 2px;
+}
+
+/* ensure more breathing room between CTA and title */
+.action-row {
+    margin-bottom: 0.8rem;
+}
+
+/* Responsive: stack buttons and hide separator on small screens */
+@media (max-width: 576px) {
+    .action-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .action-separator {
+        display: none;
+    }
+    .services-title {
+        font-size: 1.4rem;
+    }
+}
+
+/* Order form styles */
+.order-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem 1.25rem;
+    box-shadow: 0 8px 28px rgba(43,43,43,0.05);
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.order-form label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #3b3b3b;
+}
+
+.order-form .form-control,
+.order-form .form-select,
+.order-form textarea {
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 0.5rem 0.6rem;
+}
+
+.order-form .btn-primary {
+    background-color: #c85472;
+    border-color: #c85472;
+}
+.order-form .btn-primary:hover {
+    background-color: #b13f5a;
+    border-color: #b13f5a;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+    .order-form {
+        padding: 1rem;
+    }
+}
