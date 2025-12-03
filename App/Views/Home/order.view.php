@@ -15,7 +15,7 @@
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <!-- booking form: posts data to home.orderSubmit route for server-side processing -->
-        <form class="order-form" method="post" action="<?= $link->url('home.orderSubmit') ?>">
+        <form class="order-form" method="post" action="<?= $link->url('order.submit') ?>">
             <div class="row">
                 <!-- first name / last name -->
                 <div class="col-md-6 mb-3">
@@ -92,7 +92,7 @@
 
         <div class="text-center mt-3">
             <!-- back link -->
-            <a href="<?= $link->url("home.index") ?>">Späť na hlavnú stránku</a>
+            <a href="<?= $link->url('order.index') ?>">Späť na objednávky</a>
         </div>
     </div>
 </div>

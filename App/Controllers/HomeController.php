@@ -2,8 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Models\Order;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
+use Framework\Http\Responses\JsonResponse;
+use Framework\Http\Responses\RedirectResponse;
 use Framework\Http\Responses\Response;
 
 /**
@@ -65,17 +68,81 @@ class HomeController extends BaseController
     {
         return $this->html();
     }
+
     public function order(): Response
     {
         return $this->html();
     }
+
     public function services(): Response
     {
         return $this->html();
     }
+
     public function gallery(): Response
     {
         return $this->html();
     }
 
+    /**
+     * Handles the order submission from the booking form.
+     * Persists into MariaDB `orders` table and redirects back to home with a flash-like query param.
+     */
+    public function orderSubmit(Request $request): Response
+    {
+        if (!$request->isPost()) {
+            return $this->redirect($this->url('home.order'));
+        }
+
+        // Basic server-side validation and normalization
+        $first = trim((string)$request->value('first_name'));
+        $last = trim((string)$request->value('last_name'));
+        $email = trim((string)$request->value('email'));
+        $phone = trim((string)$request->value('phone'));
+        $service = trim((string)$request->value('service'));
+        $date = trim((string)$request->value('date'));
+        $time = trim((string)$request->value('time'));
+        $notes = trim((string)$request->value('notes'));
+
+        // Minimal validation
+        $errors = [];
+        if ($first === '') { $errors['first_name'] = 'Meno je povinné.'; }
+        if ($last === '') { $errors['last_name'] = 'Priezvisko je povinné.'; }
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $errors['email'] = 'Neplatný email.'; }
+        if ($phone === '') { $errors['phone'] = 'Telefón je povinný.'; }
+        if ($service === '') { $errors['service'] = 'Vyberte službu.'; }
+        if ($date === '') { $errors['date'] = 'Dátum je povinný.'; }
+        if ($time === '') { $errors['time'] = 'Čas je povinný.'; }
+
+        if (!empty($errors)) {
+            // Return JSON errors if requested via XHR, else redirect with query params
+            if ($request->isAjax()) {
+                return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
+            }
+            return $this->redirect($this->url('home.order', ['error' => 'validation']));
+        }
+
+        // Normalize time to HH:MM:SS
+        if (preg_match('/^\d{2}:\d{2}$/', $time)) {
+            $time .= ':00';
+        }
+
+        $order = new Order();
+        $order->first_name = $first;
+        $order->last_name = $last;
+        $order->email = $email;
+        $order->phone = $phone;
+        $order->service = $service;
+        $order->date = $date;   // expects Y-m-d
+        $order->time = $time;   // expects HH:MM:SS
+        $order->notes = $notes ?: null;
+
+        // Persist using base Model::save()
+        $order->save();
+
+        if ($request->isAjax()) {
+            return new JsonResponse(['ok' => true, 'id' => $order->id]);
+        }
+        return $this->redirect($this->url('home.index', ['order' => 'ok']));
+    }
 }
