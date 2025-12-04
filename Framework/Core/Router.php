@@ -16,6 +16,8 @@ class Router
 {
     private object $controller;
     private string $controllerName;
+
+
     private string $action;
 
     /**
