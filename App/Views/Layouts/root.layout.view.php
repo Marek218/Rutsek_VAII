@@ -49,6 +49,11 @@
             <li class="nav-item">
                 <a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a>
             </li>
+            <?php if ($user->isLoggedIn()) { ?>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= $link->url('admin.index') ?>">Admin</a>
+            </li>
+            <?php } ?>
 
         </ul>
         <?php if ($user->isLoggedIn()) { ?>

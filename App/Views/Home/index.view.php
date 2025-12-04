@@ -16,7 +16,7 @@
     <div class="row mt-3">
         <div class="col text-center">
             <div class="action-row" role="group" aria-label="Call to action">
-                <button class="btn" onclick="location.href='<?= $link->url('home.contact') ?>'" aria-label="Objednaj sa teraz">
+                <button class="btn" onclick="location.href='<?= $link->url('home.order') ?>'" aria-label="Objednaj sa teraz">
                     Objednaj sa teraz
                 </button>
 

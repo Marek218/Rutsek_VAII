@@ -94,6 +94,10 @@ class App
             // Process the incoming URL to determine the appropriate controller and action.
             $this->router->processURL();
 
+            // Rebuild Request to reflect any GET params derived from pretty URLs set during routing
+            $this->request = new Request();
+            $this->linkGenerator = new LinkGenerator($this->request, $this->router);
+
             // Inject the current application instance into the controller.
             call_user_func([$this->router->getController(), 'setApp'], $this);
 

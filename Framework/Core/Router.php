@@ -41,27 +41,42 @@ class Router
      */
     public function getFullControllerName(): string
     {
-        return 'App\Controllers\\' . $this->getControllerName() . "Controller";
+        return 'App\\Controllers\\' . $this->getControllerName() . "Controller";
     }
 
     /**
-     * Retrieves the controller name from the URL parameters. If no controller is specified, it defaults to "Home".
-     *
-     * @return string The name of the controller.
+     * Retrieves the controller name from the URL parameters or pretty path. If no controller is specified, defaults to "Home".
      */
     public function getControllerName(): string
     {
-        return (!isset($_GET['c']) || empty(trim(@$_GET['c']))) ? "Home" : trim(ucfirst($_GET['c']));
+        // Prefer explicit query parameter
+        if (isset($_GET['c']) && trim((string)@$_GET['c']) !== '') {
+            return trim(ucfirst((string)$_GET['c']));
+        }
+
+        // Fallback: parse from REQUEST_URI (pretty URL like /admin or /home/services)
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        $segments = array_values(array_filter(explode('/', $path), fn($s) => $s !== ''));
+        $controller = $segments[0] ?? 'Home';
+        // Optionally expose path id as GET param for convenience (/admin/edit/5)
+        if (!isset($_GET['id']) && isset($segments[2]) && ctype_digit($segments[2])) {
+            $_GET['id'] = $segments[2];
+        }
+        return trim(ucfirst($controller));
     }
 
     /**
-     * Retrieves the action name from the URL parameters. If no action is specified, it defaults to "index".
-     *
-     * @return string The name of the action to be executed.
+     * Retrieves the action name from the URL parameters or pretty path. If no action is specified, defaults to "index".
      */
     public function getAction(): string
     {
-        return (!isset($_GET['a']) || empty(trim(@$_GET['a']))) ? "index" : $_GET['a'];
+        if (isset($_GET['a']) && trim((string)@$_GET['a']) !== '') {
+            return (string)$_GET['a'];
+        }
+
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        $segments = array_values(array_filter(explode('/', $path), fn($s) => $s !== ''));
+        return $segments[1] ?? 'index';
     }
 
     /**
