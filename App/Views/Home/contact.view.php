@@ -9,14 +9,8 @@
         </h1>
     </div>
 </div>
-<div class="rect-grid">
-    <div class="rect">TU BUDE KONTAKT</div>
-</div>
-<div class="row mt-3">
-    <div class="col">
+    <div>TU BUDE KONTAKT</div>
 
-    </div>
-</div>
 <div class="row mt-3">
     <div class="col">
         <a href="<?= $link->url("home.index") ?>">Back to main page</a>

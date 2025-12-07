@@ -20,7 +20,7 @@
         <div class="alert alert-warning">Rezervácia nebola nájdená.</div>
     <?php } ?>
 
-    <div class="table-responsive">
+    <div class="table-responsive admin-table-responsive">
         <table class="table table-striped table-hover align-middle">
             <thead>
             <tr>

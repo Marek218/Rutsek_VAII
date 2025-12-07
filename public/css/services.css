@@ -23,6 +23,7 @@
     box-sizing: border-box; /* include padding when calculating min-height */
     min-height: 220px; /* make sure tile is tall enough to show full text */
     height: auto;
+    margin: 0 auto; /* horizontally center if width constrained */
 }
 
 .box .service-icon {
@@ -57,6 +58,27 @@
         min-width: 100%;
         max-width: 100%;
         flex-basis: 100%;
+    }
+}
+
+/* Center service boxes in intro and services sections */
+.boxes-row {
+    display: flex;            /* use flex for centering */
+    justify-content: center;  /* center horizontally */
+    align-items: stretch;     /* make boxes equal height if possible */
+    gap: 1.25rem;
+    flex-wrap: wrap;          /* wrap to next line on small screens */
+    margin-bottom: 1.25rem;
+}
+
+/* smaller adjustments on narrow screens */
+@media (max-width: 480px) {
+    .boxes-row {
+        gap: 0.75rem;
+    }
+    .box {
+        min-width: 100%;
+        max-width: 100%;
     }
 }
 
@@ -142,3 +164,32 @@
     }
 }
 
+/* Rectangles grid used on About page */
+.rect-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    justify-content: center; /* center horizontally */
+    align-items: stretch;
+    margin: 1.5rem 0;
+}
+
+.rect-grid .rect {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.25rem;
+    min-width: 220px;
+    max-width: 320px;
+    box-shadow: 0 6px 18px rgba(43,43,43,0.04);
+    border: 1px solid rgba(0,0,0,0.06);
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media (max-width: 576px) {
+    .rect-grid { gap: 0.75rem; }
+    .rect-grid .rect { min-width: 100%; max-width: 100%; }
+}

@@ -10,22 +10,17 @@
         <h1>Naše služby a cenník</h1>
     </div>
 </div>
-<div class="row mt-3">
-    <div class="col">
-        <a href="<?= $link->url("home.index") ?>">Späť na hlavnú stránku</a>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-md-8">
+<!-- center the content row -->
+<div class="row mt-4 justify-content-center">
+    <div class="col-md-8 mx-auto">
         <?php if ($user->isLoggedIn()) { ?>
             <form method="post" action="<?= $link->url('home.services') ?>">
         <?php } ?>
 
-        <table class="table table-striped">
+        <table class="table table-striped mx-auto">
             <thead>
             <tr>
-                <th>#</th>
                 <th>Názov položky</th>
                 <th class="text-end">Cena v EURO</th>
             </tr>
@@ -33,7 +28,6 @@
             <tbody>
             <?php foreach ($services ?? [] as $s) { ?>
                 <tr>
-                    <td><?= htmlspecialchars($s->id) ?></td>
                     <td><?= htmlspecialchars($s->name) ?></td>
                     <td class="text-end">
                         <?php if ($user->isLoggedIn()) { ?>
@@ -50,7 +44,7 @@
         </table>
 
         <?php if ($user->isLoggedIn()) { ?>
-            <div class="mt-2">
+            <div class="mt-2 text-center">
                 <button class="btn btn-primary" type="submit">Uložiť ceny</button>
                 <a class="btn btn-secondary" href="<?= $link->url('home.services') ?>">Zrušiť</a>
             </div>
@@ -62,7 +56,7 @@
         <div class="card p-3">
             <h5>Informácie</h5>
             <p>
-                Cenník platný od 07.01.2025. Ak potrebujete pomoc s rezerváciou alebo úpravou cien, prihláste sa ako admin.
+                Cenník platný od 07.01.2025. Všetky ceny sú uvedené v eurách vrátane DPH.
             </p>
         </div>
     </div>

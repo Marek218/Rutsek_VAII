@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row boxes-row">
             <div class="box">
                 <img class="service-icon" src="<?= $link->asset('images/woman-hair.png') ?>" alt="Dámske strihy ikona">
 
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row boxes-row">
             <div class="box">
                 <img class="service-icon" src="<?= $link->asset('images/woman-hair.png') ?>" alt="Trvalá ikona">
                 <h3>Trvalá</h3>

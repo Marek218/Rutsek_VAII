@@ -28,3 +28,14 @@ th.sortable .sort-indicator {
 th.sortable:not([data-order]) { opacity: 0.85; }
 th.sortable[data-order="asc"] { font-weight: 600; }
 th.sortable[data-order="desc"] { font-weight: 600; }
+
+/* Admin table: force horizontal scrolling on small screens */
+@media (max-width: 768px) {
+    .admin-table-responsive {
+        overflow-x: auto; /* ensure horizontal scroll */
+        -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    }
+    .admin-table-responsive .table {
+        min-width: 680px; /* ensure table is wider than viewport to allow horizontal scroll */
+    }
+}
