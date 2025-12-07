@@ -39,7 +39,7 @@
                         <?php if ($user->isLoggedIn()) { ?>
                             <label>
                                 <input type="text" name="price[<?= (int)$s->id ?>]" value="<?= htmlspecialchars(number_format((float)$s->price, 2, '.', '')) ?>" style="width:90px; text-align:right;" />
-                            </label>  €
+                            </label> €
                         <?php } else { ?>
                             <?= htmlspecialchars(number_format((float)$s->price, 2, ',', '')) ?> €
                         <?php } ?>
