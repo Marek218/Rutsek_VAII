@@ -1,0 +1,36 @@
+/* order.css - štýly pre formulár objednávky */
+
+.order-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem 1.25rem;
+    box-shadow: 0 8px 28px rgba(43,43,43,0.05);
+    border: 1px solid rgba(0,0,0,0.06);
+}
+.order-form label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #3b3b3b;
+}
+.order-form .form-control,
+.order-form .form-select,
+.order-form textarea {
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 0.5rem 0.6rem;
+}
+.order-form .btn-primary {
+    background-color: #c85472;
+    border-color: #c85472;
+}
+.order-form .btn-primary:hover {
+    background-color: #b13f5a;
+    border-color: #b13f5a;
+}
+
+/* spacing tweaks */
+.order-form .row { gap: 1rem; margin-bottom: 0.75rem; }
+.order-form .mb-3 { margin-bottom: 0.9rem !important; }
+.order-form .form-control,
+.order-form .form-select { min-height: 42px; }
+

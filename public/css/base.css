@@ -1,0 +1,27 @@
+/* base.css - globálne nastavenia a základné typografické pravidlá (po slovensky)
+   Obsahuje: html, body, základné nadpisy a hlavný obsah (web-content)
+*/
+
+html, body {
+    height: 100%;
+    margin: 0;
+    /* white to warm-cream background */
+    background: linear-gradient(135deg, #ffffff 0%, #fff7e6 100%);
+    color: #2b2b2b; /* dark gray text for readability */
+}
+
+h1 {
+    padding: 0.25rem;
+    color: #e3618e; /* pink accent */
+    background: transparent;
+    text-align: center; /* center the title */
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1.25rem;
+}
+
+/* Hlavná oblasť obsahu - zdieľaná medzi view súbormi */
+.web-content {
+    color: #2b2b2b;
+}
+

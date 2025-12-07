@@ -140,9 +140,19 @@ abstract class BaseController
             $viewName = $this->app->getRouter()->getControllerName() . DIRECTORY_SEPARATOR .
                 $this->app->getRouter()->getAction();
         } else {
-            $viewName = is_string($viewName) ?
-                ($this->app->getRouter()->getControllerName() . DIRECTORY_SEPARATOR . $viewName) :
-                ($viewName['0'] . DIRECTORY_SEPARATOR . $viewName['1']);
+            // If caller passed array-like spec as string (e.g. 'Admin/index') or array, handle both
+            if (is_string($viewName)) {
+                // If string contains a directory separator, treat it as explicit path and use as-is
+                if (str_contains($viewName, DIRECTORY_SEPARATOR) || str_contains($viewName, '/')) {
+                    $viewName = str_replace('/', DIRECTORY_SEPARATOR, $viewName);
+                } else {
+                    // Otherwise treat it as view name within current controller
+                    $viewName = $this->app->getRouter()->getControllerName() . DIRECTORY_SEPARATOR . $viewName;
+                }
+            } else {
+                // legacy support: when an array was passed (['Admin','index'])
+                $viewName = $viewName[0] . DIRECTORY_SEPARATOR . $viewName[1];
+            }
         }
         return new ViewResponse($this->app, $viewName, $data);
     }

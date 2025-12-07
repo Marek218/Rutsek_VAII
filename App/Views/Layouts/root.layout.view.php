@@ -8,6 +8,7 @@
 <html lang="sk">
 <head>
     <title><?= App\Configuration::APP_NAME ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="<?= $link->asset('favicons/logo.png') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= $link->asset('favicons/logo.png') ?>">
@@ -19,8 +20,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="<?= $link->asset('css/styl.css') ?>?v=<?= time() ?>">
+    <!-- Rozdelené CSS súbory: načítavajú sa v logickom poradí -->
+    <link rel="stylesheet" href="<?= $link->asset('css/base.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= $link->asset('css/navbar.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= $link->asset('css/buttons.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= $link->asset('css/services.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= $link->asset('css/order.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= $link->asset('css/footer.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= $link->asset('css/utils.css') ?>?v=<?= time() ?>">
     <script src="<?= $link->asset('js/script.js') ?>"></script>
+
 
 
 </head>
@@ -30,7 +39,14 @@
         <a class="navbar-brand" href="<?= $link->url('home.index') ?>">
             <img src="<?= $link->asset('images/logo.png') ?>" title="<?= App\Configuration::APP_NAME ?>" alt="Framework Logo">
         </a>
-        <ul class="navbar-nav me-auto">
+
+        <!-- Hamburger toggler for small screens: opens an offcanvas side menu -->
+        <button class="navbar-toggler d-block d-sm-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Otvoriť menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Desktop nav (hidden on xs) -->
+        <ul class="navbar-nav me-auto d-none d-sm-flex">
             <li class="nav-item">
                 <a class="nav-link" href="<?= $link->url('home.index') ?>">Domov</a>
             </li>
@@ -49,22 +65,18 @@
             <li class="nav-item">
                 <a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a>
             </li>
-            <?php if ($user->isLoggedIn()) { ?>
-            <li class="nav-item">
-                <a class="nav-link" href="<?= $link->url('admin.index') ?>">Admin</a>
-            </li>
-            <?php } ?>
-
         </ul>
+
+        <!-- User/login area (kept visible on sm+, hidden on xs - offcanvas shows it) -->
         <?php if ($user->isLoggedIn()) { ?>
-            <span class="navbar-text">Logged in user: <b><?= $user->getName() ?></b></span>
-            <ul class="navbar-nav ms-auto">
+            <span class="navbar-text d-none d-sm-inline">Logged in user: <b><?= $user->getName() ?></b></span>
+            <ul class="navbar-nav ms-auto d-none d-sm-flex">
                 <li class="nav-item">
                     <a class="nav-link" href="<?= $link->url('auth.logout') ?>">Log out</a>
                 </li>
             </ul>
         <?php } else { ?>
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto d-none d-sm-flex">
                 <li class="nav-item">
                     <a class="nav-link" href="<?= App\Configuration::LOGIN_URL ?>">Log in</a>
                 </li>
@@ -73,6 +85,35 @@
 
     </div>
 </nav>
+
+<!-- Offcanvas side menu for mobile (contains same links plus login/user) -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasNavbarLabel"><?= App\Configuration::APP_NAME ?></h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Zavrieť"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.index') ?>">Domov</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.services') ?>">Služby a cenník</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.about') ?>">O nás</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.order') ?>">Rezervácia</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a></li>
+    </ul>
+    <hr>
+    <?php if ($user->isLoggedIn()) { ?>
+      <div class="offcanvas-user">
+        <div class="mb-2">Prihlásený ako: <strong><?= htmlspecialchars($user->getName()) ?></strong></div>
+        <a class="btn btn-outline-secondary" href="<?= $link->url('auth.logout') ?>">Odhlásiť</a>
+      </div>
+    <?php } else { ?>
+      <a class="btn btn-primary" href="<?= App\Configuration::LOGIN_URL ?>">Prihlásiť sa</a>
+    <?php } ?>
+  </div>
+</div>
+
+
 <div class="container-fluid mt-3">
     <div class="web-content">
         <?= $contentHTML ?>

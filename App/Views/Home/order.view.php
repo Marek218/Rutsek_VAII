@@ -1,6 +1,11 @@
 <?php
 
 /** @var \Framework\Support\LinkGenerator $link */
+// Possible variables passed from controller: $errors (array), $old (array), $error (string)
+$errors = $errors ?? [];
+$old = $old ?? [];
+$error = $error ?? null;
+
 ?>
 
 <!-- Order page view: simple booking form for salon appointments -->
@@ -12,6 +17,27 @@
     </div>
 </div>
 
+<?php if ($error) { ?>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="alert alert-danger">Chyba pri uložení: <?= htmlspecialchars($error) ?></div>
+        </div>
+    </div>
+<?php } ?>
+
+<?php if (!empty($errors)) { ?>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="alert alert-warning">
+                <strong>Opravte prosím nasledujúce chyby:</strong>
+                <ul class="mb-0 mt-2">
+                    <?php foreach ($errors as $k => $v) { echo '<li>' . htmlspecialchars($v) . '</li>'; } ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <!-- booking form: posts data to home.orderSubmit route for server-side processing -->
@@ -20,15 +46,21 @@
                 <!-- first name / last name -->
                 <div class="col-md-6 mb-3">
                     <label for="first_name">Meno</label>
-                    <!-- text input: customer's first name (required) -->
+                    <!-- text input: customer's first name -->
                     <input id="first_name" name="first_name" type="text" required class="form-control"
-                           placeholder="Jana">
+                           placeholder="Jana" value="<?= htmlspecialchars($old['first_name'] ?? '') ?>">
+                    <?php if (isset($errors['first_name'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['first_name']) ?></div>
+                    <?php } ?>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="last_name">Priezvisko</label>
                     <!-- text input: customer's last name (required) -->
                     <input id="last_name" name="last_name" type="text" required class="form-control"
-                           placeholder="Nováková">
+                           placeholder="Nováková" value="<?= htmlspecialchars($old['last_name'] ?? '') ?>">
+                    <?php if (isset($errors['last_name'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['last_name']) ?></div>
+                    <?php } ?>
                 </div>
             </div>
 
@@ -38,13 +70,19 @@
                     <label for="email">Email</label>
                     <!-- email input with basic HTML validation -->
                     <input id="email" name="email" type="email" required class="form-control"
-                           placeholder="meno@priklad.sk">
+                           placeholder="meno@priklad.sk" value="<?= htmlspecialchars($old['email'] ?? '') ?>">
+                    <?php if (isset($errors['email'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['email']) ?></div>
+                    <?php } ?>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="phone">Telefón</label>
                     <!-- telephone input: pattern allows +, numbers, spaces, parentheses and hyphens -->
                     <input id="phone" name="phone" type="tel" required class="form-control"
-                           placeholder="+421 900 000 000" pattern="[+0-9 ()-]{6,20}">
+                           placeholder="+421 900 000 000" pattern="[+0-9 ()-]{6,20}" value="<?= htmlspecialchars($old['phone'] ?? '') ?>">
+                    <?php if (isset($errors['phone'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['phone']) ?></div>
+                    <?php } ?>
                 </div>
             </div>
 
@@ -55,33 +93,50 @@
                     <!-- select: choose the requested service (required) -->
                     <select id="service" name="service" class="form-select" required>
                         <option value="">Vyberte službu</option>
-                        <option value="damske">Dámske strihy</option>
-                        <option value="panske">Pánske strihy</option>
-                        <option value="farbenie">Farbenie</option>
-                        <option value="trvala">Trvalá</option>
-                        <option value="melir">Melír</option>
-                        <option value="ucesy">Účesy na príležitosť</option>
+                        <?php
+                        $svcOld = $old['service'] ?? '';
+                        $options = [
+                            'damske' => 'Dámske strihy',
+                            'panske' => 'Pánske strihy',
+                            'farbenie' => 'Farbenie',
+                            'trvala' => 'Trvalá',
+                            'melir' => 'Melír',
+                            'ucesy' => 'Účesy na príležitosť'
+                        ];
+                        foreach ($options as $val => $label) {
+                            $sel = $svcOld === $val ? ' selected' : '';
+                            echo "<option value=\"" . htmlspecialchars($val) . "\"$sel>" . htmlspecialchars($label) . "</option>";
+                        }
+                        ?>
                     </select>
+                    <?php if (isset($errors['service'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['service']) ?></div>
+                    <?php } ?>
                 </div>
 
                 <div class="col-md-3 mb-3">
                     <label for="date">Dátum</label>
                     <!-- date input: min set to today's date to prevent past bookings -->
                     <input id="date" name="date" type="date" required class="form-control"
-                           min="<?= date('Y-m-d') ?>">
+                           min="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($old['date'] ?? '') ?>">
+                    <?php if (isset($errors['date'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['date']) ?></div>
+                    <?php } ?>
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="time">Čas</label>
                     <!-- time input: 15-minute steps (step=900) -->
-                    <input id="time" name="time" type="time" required class="form-control" step="900">
+                    <input id="time" name="time" type="time" required class="form-control" step="900" value="<?= htmlspecialchars($old['time'] ?? '') ?>">
+                    <?php if (isset($errors['time'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['time']) ?></div>
+                    <?php } ?>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="notes">Poznámka (voliteľné)</label>
                 <!-- textarea for optional notes (preferences, allergies, etc.) -->
-                <textarea id="notes" name="notes" class="form-control" rows="3"
-                          placeholder="Stručné informácie, napr. preferovaný kaderník alebo alergie"></textarea>
+                <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Stručné informácie, napr. preferovaný kaderník alebo alergie"><?= htmlspecialchars($old['notes'] ?? '') ?></textarea>
             </div>
 
             <div class="text-center mt-4">

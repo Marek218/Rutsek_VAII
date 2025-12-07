@@ -49,12 +49,12 @@ class AdminController extends BaseController
     {
         $id = (int)($request->value('id') ?? 0);
         if ($id <= 0) {
-            return $this->redirect($this->url('admin.index', ['error' => 'missing']));
+            return $this->redirect($this->url('admin.index'));
         }
 
         $order = Order::getOne($id);
         if (!$order) {
-            return $this->redirect($this->url('admin.index', ['error' => 'notfound']));
+            return $this->redirect($this->url('admin.index'));
         }
 
         if ($request->isPost()) {
@@ -78,7 +78,7 @@ class AdminController extends BaseController
             $order->notes = ($notes === '' ? null : $notes);
 
             $order->save();
-            return $this->redirect($this->url('admin.index', ['saved' => 1]));
+            return $this->redirect($this->url('admin.index'));
         }
 
         return $this->html(['order' => $order], 'edit');
@@ -99,6 +99,6 @@ class AdminController extends BaseController
                 $order->delete();
             }
         }
-        return $this->redirect($this->url('admin.index', ['deleted' => 1]));
+        return $this->redirect($this->url('admin.index'));
     }
 }

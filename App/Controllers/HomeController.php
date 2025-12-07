@@ -70,8 +70,16 @@ class HomeController extends BaseController
         return $this->html();
     }
 
-    public function order(): Response
+    // Changed to accept Request to match router calling convention and ensure user detection works
+    public function order(Request $request): Response
     {
+        // Use both controller-level user and app user to be robust
+        $appUser = $this->app->getAppUser();
+        if ($this->user->isLoggedIn() || $appUser->isLoggedIn()) {
+            $orders = Order::getAll(orderBy: '`created_at` DESC');
+            return $this->html(compact('orders'), 'Admin/index');
+        }
+
         return $this->html();
     }
 
@@ -96,7 +104,8 @@ class HomeController extends BaseController
                     $svc->save();
                 }
             }
-            return $this->redirect($this->url('home.services', ['saved' => 1]));
+            // redirect back to services without query params
+            return $this->redirect($this->url('home.services'));
         }
 
         $services = Service::getAll(orderBy: '`id` ASC');
@@ -139,11 +148,12 @@ class HomeController extends BaseController
         if ($time === '') { $errors['time'] = 'Čas je povinný.'; }
 
         if (!empty($errors)) {
-            // Return JSON errors if requested via XHR, else redirect with query params
+            // Return JSON errors if requested via XHR, else render order view with errors so user sees validation messages
             if ($request->isAjax()) {
                 return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
             }
-            return $this->redirect($this->url('home.order', ['error' => 'validation']));
+            // Non-AJAX: re-render the order page with validation errors and old input
+            return $this->html(['errors' => $errors, 'old' => $request->post()]);
         }
 
         // Normalize time to HH:MM:SS
@@ -162,11 +172,21 @@ class HomeController extends BaseController
         $order->notes = $notes ?: null;
 
         // Persist using base Model::save()
-        $order->save();
+        try {
+            $order->save();
+        } catch (\Exception $e) {
+            // Return clear JSON error so developer can see the problem in Network tab
+            if ($request->isAjax() || $request->wantsJson()) {
+                return new JsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
+            }
+            // Non-AJAX: re-render order page with error message and old input so user sees problem
+            return $this->html(['error' => $e->getMessage(), 'old' => $request->post()]);
+        }
 
         if ($request->isAjax()) {
             return new JsonResponse(['ok' => true, 'id' => $order->id]);
         }
-        return $this->redirect($this->url('home.index', ['order' => 'ok']));
+        // redirect after success
+        return $this->redirect($this->url('home.index'));
     }
 }

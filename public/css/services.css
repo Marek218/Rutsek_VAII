@@ -1,0 +1,144 @@
+/* services.css - štýly pre sekciu služieb a cenník (boxy, grid, service-item) */
+
+.row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 220px;
+    max-width: 320px;
+    flex: 1 1 260px; /* flexible base width */
+    padding: 1.25rem;
+    background: #fff; /* keep white to contrast with cream background */
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(43,43,43,0.04);
+    border: 1px solid #000; /* thin black border as requested */
+    text-align: center;
+    box-sizing: border-box; /* include padding when calculating min-height */
+    min-height: 220px; /* make sure tile is tall enough to show full text */
+    height: auto;
+}
+
+.box .service-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 0.8rem;
+}
+
+.box h3 {
+    margin: 0.3rem 0 0.5rem 0;
+    font-size: 1.05rem;
+    color: #c85472;
+}
+.box .service-desc {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (min-width: 992px) {
+    .box {
+        padding: 1.5rem;
+    }
+    .box .service-icon {
+        width: 72px;
+        height: 72px;
+    }
+}
+
+@media (max-width: 480px) {
+    .box {
+        min-width: 100%;
+        max-width: 100%;
+        flex-basis: 100%;
+    }
+}
+
+.services-section {
+    padding: 3.5rem 1rem;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem 3.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.service-item {
+    text-align: center; /* center the title and description */
+    padding: 0.5rem 0.5rem;
+}
+
+.service-icon {
+    color: #c85472; /* muted pink for the icons */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.service-item .service-icon {
+    display: block;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+}
+
+.service-item h3 {
+    margin: 0 0 0.5rem 0;
+    color: #c85472; /* heading pink */
+    font-size: 1.05rem;
+}
+
+.service-desc {
+    margin: 0;
+    color: #6b6b6b; /* subdued gray for description */
+    font-size: 0.85rem;
+}
+
+@media (max-width: 1200px) {
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 992px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    .service-item {
+        text-align: center; /* center items on narrower screens */
+    }
+    .service-icon {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+@media (max-width: 576px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+    .service-item {
+        text-align: center;
+    }
+    .service-icon {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+

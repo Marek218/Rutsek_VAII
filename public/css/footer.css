@@ -1,0 +1,55 @@
+/* footer.css - štýly pre pätičku (footer) */
+
+.site-footer {
+    background: linear-gradient(180deg, #f9e9ec 0%, #f7e6e9 100%);
+    color: #4a2b2b;
+    padding: 0.6rem 0; /* even smaller vertical padding */
+    margin-top: 0.8rem; /* reduce space above footer */
+    font-size: 0.92rem;
+}
+
+.site-footer .container > .row {
+    display: flex;
+    flex-wrap: nowrap; /* prefer side-by-side on wide screens */
+    align-items: center; /* vertical centering of columns */
+    gap: 0.75rem 2rem;
+}
+
+.site-footer .col-md-4 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+    flex: 1 1 0; /* distribute columns evenly */
+    min-width: 200px; /* allow wrapping on narrow screens */
+}
+
+.site-footer h5 {
+    color: #a93b5d;
+    margin: 0 0 0.2rem 0;
+    font-size: 0.98rem;
+}
+
+.site-footer p {
+    color: #5a4a4a;
+    margin: 0 0 0.2rem 0;
+    font-size: 0.82rem;
+}
+
+.site-footer .list-unstyled { margin: 0; padding: 0; }
+.site-footer .list-unstyled li { margin-bottom: 0.18rem; }
+.site-footer .footer-link { color: #6b3d4f; text-decoration: none; font-size: 0.88rem; }
+.site-footer .footer-link:hover { color: #c85472; text-decoration: underline; }
+.site-footer .footer-separator { border: none; border-top: 1px solid rgba(200,180,175,0.16); margin: 0.45rem 0; }
+.site-footer .footer-copy { color: #6b3d4f; font-size: 0.76rem; padding: 0.15rem 0 0 0; }
+
+@media (max-width: 900px) {
+    .site-footer .container > .row { flex-wrap: wrap; }
+}
+@media (max-width: 767px) {
+    .site-footer { padding: 0.6rem 0; }
+    .site-footer .container > .row { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .site-footer .col-md-4 { width: 100%; }
+}
+

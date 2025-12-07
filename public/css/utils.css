@@ -1,0 +1,30 @@
+/* utils.css - pomocné triedy a responzívne utility */
+
+.row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; }
+.col-12 { flex: 0 0 100%; max-width: 100%; }
+@media (min-width: 768px) { .col-md-6 { flex: 0 0 calc(50% - 10px); max-width: calc(50% - 10px); } }
+.col-lg-8 { flex: 0 0 100%; max-width: 100%; }
+@media (min-width: 992px) { .col-lg-8 { flex: 0 0 66.6667%; max-width: 66.6667%; } .offset-lg-2 { margin-left: 16.6667%; } }
+
+.d-flex { display: flex; }
+.flex-column { flex-direction: column; }
+.gap-2 { gap: 0.5rem; }
+@media (min-width: 768px) { .flex-md-row { flex-direction: row; } }
+
+.form-select { display: block; width: 100%; padding: 0.5rem 0.6rem; font-size: 1rem; line-height: 1.5; color: #2b2b2b; background-color: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; }
+
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Sort indicator in table headers - small arrow to show current sort direction */
+th.sortable { position: relative; }
+th.sortable .sort-indicator {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: #6b3d4f;
+}
+
+/* Optionally dim non-active sortable headers */
+th.sortable:not([data-order]) { opacity: 0.85; }
+th.sortable[data-order="asc"] { font-weight: 600; }
+th.sortable[data-order="desc"] { font-weight: 600; }

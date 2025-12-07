@@ -1,0 +1,42 @@
+/* navbar.css - štýly pre hlavnú navigáciu (navbar) a logo */
+
+.navbar-brand img {
+    max-height: 40px; /* smaller logo */
+    width: auto;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #fdfdfd 0%, #fdfdfd 100%);
+    box-shadow: 0 1px 4px rgba(43, 43, 43, 0.06);
+}
+
+a.nav-link {
+    color: #2b2b2b !important;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.2s, color 0.2s;
+}
+a.nav-link:hover, a.nav-link:focus {
+    color: #c85472 !important;
+    border-bottom: 2px solid #c85472;
+}
+
+/* Offcanvas / mobile tweaks */
+.navbar-toggler {
+    border: 0;
+    background: transparent;
+}
+.navbar-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(43,43,43,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.offcanvas-body {
+    padding: 1rem 1.25rem;
+}
+
+.offcanvas-user { margin-top: 0.5rem; }
+
+@media (min-width: 576px) {
+    /* ensure toggler hidden on sm+ (we already set classes), keep spacing consistent */
+    .navbar-toggler { display: none !important; }
+}

@@ -18,6 +18,7 @@ class OrderController extends BaseController
     // Shows the booking form view
     public function index(Request $request): Response
     {
+        // Always show the public booking form; admin UI removed
         return $this->html();
     }
 
@@ -42,6 +43,7 @@ class OrderController extends BaseController
         $notes = trim((string)$request->value('notes'));
 
         $errors = [];
+        // first name is required
         if ($first === '') { $errors['first_name'] = 'Meno je povinné.'; }
         if ($last === '') { $errors['last_name'] = 'Priezvisko je povinné.'; }
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $errors['email'] = 'Neplatný email.'; }
@@ -54,7 +56,8 @@ class OrderController extends BaseController
             if ($request->isAjax()) {
                 return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
             }
-            return $this->redirect($this->url('order.index', ['error' => 'validation']));
+            // Non-AJAX: re-render view with errors and old input
+            return $this->html(['errors' => $errors, 'old' => $request->post()], 'Home/order');
         }
 
         if (preg_match('/^\d{2}:\d{2}$/', $time)) {
@@ -70,13 +73,20 @@ class OrderController extends BaseController
         $order->date = $date;
         $order->time = $time;
         $order->notes = $notes ?: null;
-        $order->save();
+
+        try {
+            $order->save();
+        } catch (\Exception $e) {
+            if ($request->isAjax()) {
+                return new JsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
+            }
+            return $this->html(['error' => $e->getMessage(), 'old' => $request->post()], 'Home/order');
+        }
 
         if ($request->isAjax()) {
             return new JsonResponse(['ok' => true, 'id' => $order->id]);
         }
 
-        return $this->redirect($this->url('home.index', ['order' => 'ok']));
+        return $this->redirect($this->url('home.index'));
     }
 }
-
