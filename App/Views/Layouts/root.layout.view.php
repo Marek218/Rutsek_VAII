@@ -57,6 +57,9 @@
                 <a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="<?= $link->url('post.index') ?>">Príspevky</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="<?= $link->url('home.about') ?>">O nás</a>
             </li>
             <li class="nav-item">
@@ -97,6 +100,7 @@
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.index') ?>">Domov</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.services') ?>">Služby a cenník</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('post.index') ?>">Príspevky</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.about') ?>">O nás</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.order') ?>">Rezervácia</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a></li>
@@ -124,26 +128,17 @@
     <div class="container">
         <div class="row">
             <!-- Stĺpec 1 -->
-            <div class="col-md-4 mb-4">
+            <div class="col-md-6 mb-4">
                 <h5 class="fw-bold">Kaderníctvo Luxer</h5>
                 <p class="mt-3">
                     Profesionálna starostlivosť o vaše vlasy v<br>
                     srdci Banskej Bystrice
                 </p>
             </div>
-            <!-- Stĺpec 2 -->
-            <div class="col-md-4 mb-4">
-                <h5 class="fw-bold">Rýchle odkazy</h5>
-                <ul class="list-unstyled mt-3">
-                    <li><a href="<?= $link->url('home.index') ?>" class="footer-link">Domov</a></li>
-                    <li><a href="<?= $link->url('home.services') ?>" class="footer-link">Služby a cenník</a></li>
-                    <li><a href="<?= $link->url('home.gallery') ?>" class="footer-link">Galéria</a></li>
-                    <li><a href="<?= $link->url('home.contact') ?>" class="footer-link">Kontakt</a></li>
-                </ul>
-            </div>
+            <!-- Stĺpec 2 (removed quick links) -->
 
-            <!-- Stĺpec 3 -->
-            <div class="col-md-4 mb-4">
+            <!-- Stĺpec 3 (expanded) -->
+            <div class="col-md-6 mb-4">
                 <h5 class="fw-bold">Kontakt</h5>
                 <p class="mt-3 mb-1">Námestie Slobody 4<br>Banská Bystrica</p>
                 <p class="mb-1">

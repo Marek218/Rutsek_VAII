@@ -39,3 +39,97 @@ th.sortable[data-order="desc"] { font-weight: 600; }
         min-width: 680px; /* ensure table is wider than viewport to allow horizontal scroll */
     }
 }
+
+/* Contact layout — prefer grid, remove older flex-based constraints that caused large gaps */
+/* Make the left info column reasonably wide and the map take remaining space; tighten gaps. */
+.contact-phone { color: #e3618e; font-weight: 600; }
+.contact-meta a { color: #6b3d4f; text-decoration: none; }
+.contact-meta a:hover { text-decoration: underline; }
+.btn-call { border-radius: 8px; padding: 0.45rem 0.85rem; }
+
+.contact-grid {
+    display: grid;
+    gap: 1rem; /* moderate gap */
+    grid-template-columns: 1fr; /* stack by default */
+    align-items: stretch; /* ensure left and right cards match height */
+}
+@media (min-width: 880px) {
+    /* left column fixed width to fit the card nicely, right column takes remaining space */
+    .contact-grid { grid-template-columns: 420px 1fr; }
+}
+
+/* Ensure cards fill their grid cells and images scale nicely */
+.contact-grid > * { width: 100%; }
+.contact-grid .card { height: 100%; }
+.contact-left img { width: 96px; max-width: 100%; height: auto; border-radius:8px; }
+
+/* tighten left card content spacing */
+.contact-left .card-body { padding: 1rem; }
+/* Make form card full width visually distinct */
+.contact-form-card { margin-top: 1.25rem; }
+
+/* Gallery styles */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+    gap: 1rem;
+    align-items: start;
+}
+.gallery-thumb {
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(51,43,40,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.gallery-thumb img {
+    display: block;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+.gallery-thumb:hover { transform: translateY(-6px); box-shadow: 0 10px 26px rgba(51,43,40,0.12); }
+.gallery-thumb:hover img { transform: scale(1.06); }
+.gallery-caption { padding: 0.6rem 0.75rem; text-align: left; }
+.gallery-caption .title { font-weight: 600; color: #332b28; }
+.gallery-caption .meta { color: #6b3d4f; font-size: 0.95rem; }
+
+/* Gallery: nicer handling for external URLs */
+.gallery-thumb a { display:block; color: inherit; text-decoration:none; }
+.gallery-thumb img { background: #f3f3f3; }
+.gallery-thumb.is-broken img { filter: grayscale(1); opacity: 0.85; }
+.gallery-badge {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.08rem 0.4rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: rgba(227,97,142,0.12);
+    color: #6b3d4f;
+}
+
+/* Full-width form / price section */
+.price-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 0.75rem; }
+.price-item { background: #fff; padding: 0.6rem 0.75rem; border-radius: 8px; box-shadow: 0 6px 16px rgba(51,43,40,0.04); }
+.price-item h6 { margin: 0 0 0.25rem 0; font-size: 0.95rem; color: #332b28; }
+.price-item p { margin: 0; color: #6b3d4f; font-weight: 600; }
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+    .gallery-thumb img { height: 150px; }
+}
+
+.gallery-thumb { position: relative; }
+.gallery-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 1rem;
+    text-align: center;
+    background: rgba(255,255,255,0.92);
+    color: #6b3d4f;
+}

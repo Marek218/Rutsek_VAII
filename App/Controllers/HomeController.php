@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\Gallery;
 use App\Models\Order;
 use App\Models\Service;
 use Framework\Core\BaseController;
@@ -114,7 +115,18 @@ class HomeController extends BaseController
 
     public function gallery(): Response
     {
-        return $this->html();
+        $galleryItems = [];
+        $galleryError = null;
+
+        try {
+            $galleryItems = Gallery::getAll(whereClause: '`is_public` = 1', orderBy: '`sort_order` ASC, `id` ASC');
+        } catch (\Throwable $e) {
+            // Table likely not initialized yet; don't crash the whole site.
+            $galleryError = $e->getMessage();
+            $galleryItems = [];
+        }
+
+        return $this->html(compact('galleryItems', 'galleryError'));
     }
 
     /**
