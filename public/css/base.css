@@ -3,9 +3,7 @@
 */
 
 html, body {
-    height: 100%;
     margin: 0;
-    /* white to warm-cream background */
     background: linear-gradient(135deg, #ffffff 0%, #fff7e6 100%);
     color: #2b2b2b; /* dark gray text for readability */
 }
@@ -24,5 +22,3 @@ h1 {
 .web-content {
     color: #2b2b2b;
 }
-
-

@@ -28,7 +28,8 @@
     <link rel="stylesheet" href="<?= $link->asset('css/order.css') ?>?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= $link->asset('css/footer.css') ?>?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= $link->asset('css/utils.css') ?>?v=<?= time() ?>">
-    <script src="<?= $link->asset('js/script.js') ?>"></script>
+    <link rel="stylesheet" href="<?= $link->asset('css/theme.css') ?>?v=<?= time() ?>">
+    <script src="<?= $link->asset('js/script.js') ?>" defer></script>
 
 
 
@@ -57,9 +58,6 @@
                 <a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= $link->url('home.about') ?>">O nás</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="<?= $link->url('home.order') ?>">Rezervácia</a>
             </li>
             <li class="nav-item">
@@ -70,13 +68,25 @@
         <!-- User/login area (kept visible on sm+, hidden on xs - offcanvas shows it) -->
         <?php if ($user->isLoggedIn()) { ?>
             <span class="navbar-text d-none d-sm-inline">Logged in user: <b><?= $user->getName() ?></b></span>
-            <ul class="navbar-nav ms-auto d-none d-sm-flex">
+            <ul class="navbar-nav ms-auto d-none d-sm-flex align-items-center">
+                <li class="nav-item me-2">
+                    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Prepnúť motív">
+                        <span class="dot" aria-hidden="true"></span>
+                        <span class="label" data-theme-label>Motív</span>
+                    </button>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= $link->url('auth.logout') ?>">Log out</a>
                 </li>
             </ul>
         <?php } else { ?>
-            <ul class="navbar-nav ms-auto d-none d-sm-flex">
+            <ul class="navbar-nav ms-auto d-none d-sm-flex align-items-center">
+                <li class="nav-item me-2">
+                    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Prepnúť motív">
+                        <span class="dot" aria-hidden="true"></span>
+                        <span class="label" data-theme-label>Motív</span>
+                    </button>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= App\Configuration::LOGIN_URL ?>">Log in</a>
                 </li>
@@ -97,11 +107,18 @@
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.index') ?>">Domov</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.services') ?>">Služby a cenník</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a></li>
-      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.about') ?>">O nás</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.order') ?>">Rezervácia</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a></li>
     </ul>
     <hr>
+
+    <div class="mb-3">
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Prepnúť motív">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="label" data-theme-label>Motív</span>
+        </button>
+    </div>
+
     <?php if ($user->isLoggedIn()) { ?>
       <div class="offcanvas-user">
         <div class="mb-2">Prihlásený ako: <strong><?= htmlspecialchars($user->getName()) ?></strong></div>

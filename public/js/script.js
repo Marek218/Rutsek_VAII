@@ -5,6 +5,75 @@
 (function () {
     'use strict';
 
+    // Theme toggle
+    const STORAGE_KEY = 'lux.theme';
+    let themeInitDone = false;
+
+    function getPreferredTheme() {
+        const saved = window.localStorage ? localStorage.getItem(STORAGE_KEY) : null;
+        if (saved === 'light' || saved === 'dark') return saved;
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return prefersDark ? 'dark' : 'light';
+    }
+
+    function applyThemeToDom(theme) {
+        const root = document.documentElement;
+        if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+        } else {
+            root.removeAttribute('data-theme');
+        }
+
+        // Update all toggle labels
+        document.querySelectorAll('[data-theme-label]').forEach(el => {
+            el.textContent = theme === 'dark' ? 'Tmavý' : 'Svetlý';
+        });
+    }
+
+    function setTheme(theme) {
+        applyThemeToDom(theme);
+        try {
+            localStorage.setItem(STORAGE_KEY, theme);
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+    }
+
+    function findClosest(el, selector) {
+        // Guard for text nodes
+        if (el && el.nodeType === 3) el = el.parentElement;
+        // Use native closest if present
+        if (el && typeof el.closest === 'function') return el.closest(selector);
+        // Fallback walk-up
+        while (el && el.nodeType === 1) {
+            if (el.matches && el.matches(selector)) return el;
+            el = el.parentElement;
+        }
+        return null;
+    }
+
+    function initThemeToggle() {
+        if (themeInitDone) return;
+        themeInitDone = true;
+
+        // Apply initial theme
+        setTheme(getPreferredTheme());
+
+        // Event delegation (works even if buttons are added later)
+        document.addEventListener('click', function (e) {
+            var btn = findClosest(e.target, '[data-theme-toggle]');
+            if (!btn) return;
+            e.preventDefault();
+            toggleTheme();
+        }, false);
+    }
+
     function initAdminOrdersTable() {
         const table = document.querySelector('.table.table-striped.table-hover.align-middle');
         if (!table) return; // not present on this page
@@ -21,8 +90,8 @@
             // If already set, leave it
             if (row.dataset.datetime && row.dataset.datetime !== '') return;
 
-            const dateText = cells[4]?.textContent?.trim() || '';
-            const timeText = cells[5]?.textContent?.trim() || '';
+            const dateText = (cells[4] && cells[4].textContent ? String(cells[4].textContent).trim() : '');
+            const timeText = (cells[5] && cells[5].textContent ? String(cells[5].textContent).trim() : '');
             // Normalize to ISO-like string for Date.parse
             // Expected input format: YYYY-MM-DD and HH:MM
             if (dateText) {
@@ -30,6 +99,9 @@
             } else {
                 row.dataset.datetime = '';
             }
+
+            // NOTE: compatibility: avoid optional chaining
+            // (kept processed above)
         });
 
         // Make headers sortable: find header cells for "Meno" and "Dátum"
@@ -97,8 +169,10 @@
                         vA = rA.dataset.datetime ? Date.parse(rA.dataset.datetime) : 0;
                         vB = rB.dataset.datetime ? Date.parse(rB.dataset.datetime) : 0;
                     } else if (sortState.key === 'name') {
-                        vA = (rA.querySelector('td')?.textContent || '').trim().toLowerCase();
-                        vB = (rB.querySelector('td')?.textContent || '').trim().toLowerCase();
+                        const tdA = rA.querySelector('td');
+                        const tdB = rB.querySelector('td');
+                        vA = (tdA && tdA.textContent ? String(tdA.textContent) : '').trim().toLowerCase();
+                        vB = (tdB && tdB.textContent ? String(tdB.textContent) : '').trim().toLowerCase();
                     } else {
                         vA = (rA.textContent || '').trim().toLowerCase();
                         vB = (rB.textContent || '').trim().toLowerCase();
@@ -127,8 +201,12 @@
 
     // Init on DOM ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAdminOrdersTable);
+        document.addEventListener('DOMContentLoaded', function(){
+            initThemeToggle();
+            initAdminOrdersTable();
+        });
     } else {
+        initThemeToggle();
         initAdminOrdersTable();
     }
 })();

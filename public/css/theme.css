@@ -1,0 +1,219 @@
+/* theme.css - light/dark theme tokens via CSS variables */
+
+:root {
+    /* Accent tuned to your screenshot (pink + violet/blue) */
+    --lux-accent: #ff6b9e;
+    --lux-accent-2: #c85472;
+
+    /* Light theme */
+    --lux-bg: linear-gradient(135deg, #ffffff 0%, #fff7e6 100%);
+    --lux-surface: #ffffff;
+    --lux-text: #2b2b2b;
+    --lux-muted: #6b3d4f;
+    --lux-border: rgba(0,0,0,0.08);
+
+    --lux-nav-bg: linear-gradient(135deg, #fdfdfd 0%, #fdfdfd 100%);
+    --lux-nav-text: #2b2b2b;
+    --lux-nav-shadow: 0 1px 4px rgba(43, 43, 43, 0.06);
+
+    --lux-btn-bg: var(--lux-accent);
+    --lux-btn-text: #ffffff;
+    --lux-footer-bg: linear-gradient(180deg, #f9e9ec 0%, #f7e6e9 100%);
+    --lux-footer-text: #4a2b2b;
+    --lux-footer-link: #6b3d4f;
+    --lux-footer-link-hover: #c85472;
+
+    --lux-input-bg: #ffffff;
+    --lux-input-text: #2b2b2b;
+    --lux-input-border: rgba(0,0,0,0.10);
+    --lux-input-focus: rgba(255,107,158,0.28);
+
+    --lux-link: #6b3d4f;
+    --lux-link-hover: #c85472;
+    --lux-contact-link: var(--lux-link);
+
+    --lux-surface-2: rgba(0,0,0,0.02);
+    --lux-table-head-bg: rgba(0,0,0,0.03);
+    --lux-table-row-odd: rgba(0,0,0,0.02);
+
+    color-scheme: light;
+}
+
+/* Dark theme (matches screenshot vibe: deep navy + violet/blue gradient) */
+:root[data-theme="dark"] {
+    --lux-bg: radial-gradient(1200px 600px at 20% 28%, rgba(96, 165, 250, 0.16) 0%, rgba(0,0,0,0) 58%),
+              radial-gradient(900px 520px at 82% 68%, rgba(168, 85, 247, 0.14) 0%, rgba(0,0,0,0) 62%),
+              linear-gradient(135deg, #0b1220 0%, #141732 55%, #1a1230 100%);
+
+    --lux-surface: rgba(255,255,255,0.06);
+    --lux-text: #eef1ff;
+    --lux-muted: rgba(238,241,255,0.72);
+    --lux-border: rgba(255,255,255,0.10);
+
+    --lux-nav-bg: linear-gradient(135deg, #0b1220 0%, #0e1a2f 55%, #111b33 100%);
+    --lux-nav-text: #eef1ff;
+    --lux-nav-shadow: 0 8px 24px rgba(0,0,0,0.35);
+
+    --lux-btn-bg: #ff86b3;
+    --lux-btn-text: #0b1220;
+
+    --lux-footer-bg: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.04) 100%);
+    --lux-footer-text: rgba(238,241,255,0.84);
+    --lux-footer-link: rgba(238,241,255,0.78);
+    --lux-footer-link-hover: #ff86b3;
+
+    --lux-input-bg: rgba(255,255,255,0.06);
+    --lux-input-text: #eef1ff;
+    --lux-input-border: rgba(255,255,255,0.14);
+    --lux-input-focus: rgba(96,165,250,0.22);
+
+    --lux-link: rgba(238,241,255,0.78);
+    --lux-link-hover: #ff86b3;
+    --lux-contact-link: var(--lux-link);
+
+    /* Darker surfaces for lists/tables */
+    --lux-surface-2: rgba(0,0,0,0.28);
+    --lux-table-head-bg: rgba(0,0,0,0.38);
+    --lux-table-row-odd: rgba(0,0,0,0.30);
+
+    color-scheme: dark;
+}
+
+/* Apply tokens */
+html, body {
+    background: var(--lux-bg);
+    color: var(--lux-text);
+}
+
+.web-content { color: var(--lux-text); }
+
+/* Navbar tokens */
+.navbar {
+    background: var(--lux-nav-bg) !important;
+    box-shadow: var(--lux-nav-shadow);
+}
+
+a.nav-link {
+    color: var(--lux-nav-text) !important;
+}
+
+a.nav-link:hover, a.nav-link:focus {
+    color: var(--lux-accent-2) !important;
+    border-bottom-color: var(--lux-accent-2);
+}
+
+/* Make the hamburger icon visible in both themes */
+.navbar-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(238,241,255,0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+:root:not([data-theme="dark"]) .navbar-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(43,43,43,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Cards / tables: keep bootstrap, just nudge colors in dark */
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .offcanvas {
+    background: rgba(255,255,255,0.06) !important;
+    color: var(--lux-text);
+    border-color: var(--lux-border) !important;
+}
+
+/* Optional: keep generic tables readable without forcing a bright background.
+   Specific table styling should be done in feature CSS (e.g. services.css). */
+:root[data-theme="dark"] .table {
+    color: var(--lux-text);
+    border-color: var(--lux-border) !important;
+}
+
+:root[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-bg-type: var(--lux-table-row-odd);
+}
+
+:root[data-theme="dark"] .modal-content {
+    background: rgba(10, 14, 24, 0.92) !important;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    border: 1px solid var(--lux-border);
+    background: rgba(255,255,255,0.08);
+    color: var(--lux-nav-text);
+    border-radius: 999px;
+    padding: 0.4rem 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    line-height: 1;
+}
+
+:root:not([data-theme="dark"]) .theme-toggle {
+    background: rgba(0,0,0,0.03);
+}
+
+.theme-toggle:focus {
+    outline: 2px solid rgba(255,107,158,0.45);
+    outline-offset: 2px;
+}
+
+.theme-toggle .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--lux-btn-bg);
+    box-shadow: 0 0 0 3px rgba(255,107,158,0.16);
+}
+
+.theme-toggle .label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Footer tokens */
+.site-footer {
+    background: var(--lux-footer-bg) !important;
+    color: var(--lux-footer-text) !important;
+}
+.site-footer h5,
+.site-footer p,
+.site-footer .footer-copy {
+    color: var(--lux-footer-text) !important;
+}
+.site-footer .footer-link { color: var(--lux-footer-link) !important; }
+.site-footer .footer-link:hover { color: var(--lux-footer-link-hover) !important; }
+.site-footer .footer-separator { border-top-color: var(--lux-border) !important; }
+
+/* Forms: soften visuals for both themes */
+.form-control,
+.form-select,
+textarea,
+.form-check-input {
+    background: var(--lux-input-bg) !important;
+    color: var(--lux-input-text) !important;
+    border-color: var(--lux-input-border) !important;
+}
+.form-control::placeholder,
+textarea::placeholder {
+    color: rgba(107,61,79,0.55);
+}
+:root[data-theme="dark"] .form-control::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+    color: rgba(238,241,255,0.55);
+}
+.form-control:focus,
+.form-select:focus,
+textarea:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem var(--lux-input-focus) !important;
+    border-color: rgba(255,107,158,0.45) !important;
+}
+:root[data-theme="dark"] .form-control:focus,
+:root[data-theme="dark"] .form-select:focus,
+:root[data-theme="dark"] textarea:focus {
+    border-color: rgba(96,165,250,0.55) !important;
+}
+
+/* Reduce harsh pink buttons on forms in dark (keep brand) */
+:root[data-theme="dark"] .btn {
+    box-shadow: none;
+}

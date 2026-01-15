@@ -18,7 +18,7 @@
             <form method="post" action="<?= $link->url('home.services') ?>">
         <?php } ?>
 
-        <table class="table table-striped mx-auto">
+        <table class="table table-striped mx-auto services-table">
             <thead>
             <tr>
                 <th>Názov položky</th>
@@ -32,7 +32,7 @@
                     <td class="text-end">
                         <?php if ($user->isLoggedIn()) { ?>
                             <label>
-                                <input type="text" name="price[<?= (int)$s->id ?>]" value="<?= htmlspecialchars(number_format((float)$s->price, 2, '.', '')) ?>" style="width:90px; text-align:right;" />
+                                <input type="text" name="price[<?= (int)$s->id ?>]" value="<?= htmlspecialchars(number_format((float)$s->price, 2, '.', '')) ?>" />
                             </label> €
                         <?php } else { ?>
                             <?= htmlspecialchars(number_format((float)$s->price, 2, ',', '')) ?> €

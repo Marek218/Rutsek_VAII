@@ -62,15 +62,6 @@ class HomeController extends BaseController
         return $this->html();
     }
 
-    /**
-     * Displays the about page.
-     *
-     * @return Response The response object containing the rendered HTML for the about page.
-     */
-    public function about(): Response
-    {
-        return $this->html();
-    }
 
     // Changed to accept Request to match router calling convention and ensure user detection works
     public function order(Request $request): Response
