@@ -10,6 +10,7 @@ use Framework\Http\Request;
 use Framework\Http\Responses\JsonResponse;
 use Framework\Http\Responses\RedirectResponse;
 use Framework\Http\Responses\Response;
+use App\Configuration;
 
 /**
  * Class HomeController
@@ -113,20 +114,100 @@ class HomeController extends BaseController
         return $this->html(compact('services'));
     }
 
-    public function gallery(): Response
+    public function gallery(Request $request): Response
     {
         $galleryItems = [];
         $galleryError = null;
 
+        $isAdmin = $this->user->isLoggedIn();
+        $flash = (string)($request->value('flash') ?? '');
+
+        // Handle admin actions on the same page
+        if ($isAdmin && $request->isPost()) {
+            $mode = (string)($request->value('mode') ?? '');
+
+            try {
+                if ($mode === 'upload') {
+                    $file = $request->file('image');
+                    if (!$file || !$file->isOk()) {
+                        return $this->redirect($this->url('home.gallery', ['flash' => 'uploaderror']));
+                    }
+
+                    $origName = $file->getName();
+                    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+                    if (!in_array($ext, ['png', 'jpg', 'jpeg'], true)) {
+                        return $this->redirect($this->url('home.gallery', ['flash' => 'badtype']));
+                    }
+
+                    $publicDir = realpath(__DIR__ . '/../../public');
+                    if ($publicDir === false) {
+                        return $this->redirect($this->url('home.gallery', ['flash' => 'nopublicdir']));
+                    }
+                    $uploadDir = rtrim($publicDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . Configuration::UPLOAD_DIR . 'gallery';
+                    if (!is_dir($uploadDir)) {
+                        @mkdir($uploadDir, 0777, true);
+                    }
+
+                    $random = bin2hex(random_bytes(8));
+                    $baseName = pathinfo($origName, PATHINFO_FILENAME);
+                    $baseName = preg_replace('~[^a-z0-9_-]+~i', '-', $baseName);
+                    $baseName = trim($baseName, '-');
+                    if ($baseName === '') { $baseName = 'image'; }
+
+                    $fileName = $baseName . '-' . date('Ymd-His') . '-' . $random . '.' . $ext;
+                    $targetPath = $uploadDir . DIRECTORY_SEPARATOR . $fileName;
+
+                    if (!$file->store($targetPath)) {
+                        return $this->redirect($this->url('home.gallery', ['flash' => 'storefail']));
+                    }
+
+                    $item = new Gallery();
+                    $item->title = trim((string)$request->value('title')) ?: null;
+                    $item->category = trim((string)$request->value('category')) ?: null;
+                    $item->is_public = (int)($request->value('is_public') ?? 1);
+                    $item->sort_order = (int)($request->value('sort_order') ?? 0);
+                    $item->path_url = 'uploads/gallery/' . $fileName;
+                    $item->save();
+
+                    return $this->redirect($this->url('home.gallery', ['flash' => 'ok']));
+                }
+
+                if ($mode === 'delete') {
+                    $id = (int)($request->value('id') ?? 0);
+                    if ($id > 0) {
+                        $item = Gallery::getOne($id);
+                        if ($item) {
+                            $rel = (string)($item->path_url ?? '');
+                            $publicDir = realpath(__DIR__ . '/../../public');
+                            if ($publicDir !== false) {
+                                $abs = rtrim($publicDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, ltrim($rel, '/'));
+                                if (is_file($abs)) {
+                                    @unlink($abs);
+                                }
+                            }
+                            $item->delete();
+                        }
+                    }
+                    return $this->redirect($this->url('home.gallery', ['flash' => 'deleted']));
+                }
+            } catch (\Throwable $e) {
+                return $this->redirect($this->url('home.gallery', ['flash' => 'exception']));
+            }
+        }
+
         try {
-            $galleryItems = Gallery::getAll(whereClause: '`is_public` = 1', orderBy: '`sort_order` ASC, `id` ASC');
+            if ($isAdmin) {
+                // Admin sees all
+                $galleryItems = Gallery::getAll(orderBy: '`sort_order` ASC, `id` ASC');
+            } else {
+                $galleryItems = Gallery::getAll(whereClause: '`is_public` = 1', orderBy: '`sort_order` ASC, `id` ASC');
+            }
         } catch (\Throwable $e) {
-            // Table likely not initialized yet; don't crash the whole site.
             $galleryError = $e->getMessage();
             $galleryItems = [];
         }
 
-        return $this->html(compact('galleryItems', 'galleryError'));
+        return $this->html(compact('galleryItems', 'galleryError', 'isAdmin', 'flash'));
     }
 
     /**

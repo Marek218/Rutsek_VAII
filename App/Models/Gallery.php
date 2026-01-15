@@ -22,14 +22,11 @@ class Gallery extends Model
     public ?string $title = null;
     public ?string $category = null;
 
-    /** External URL stored under the exercise column name `path_url` */
+    /**
+     * Local path relative to public/ (e.g. "uploads/gallery/1.jpg").
+     * This is the only image source stored in DB.
+     */
     public ?string $path_url = null;
-
-    /** External URL (https://...) */
-    public ?string $image_url = null;
-
-    /** Path relative to public root (e.g. "images/gallery/1.jpg") */
-    public ?string $image_path = null;
 
     public ?int $is_public = 1;
     public ?int $sort_order = 0;

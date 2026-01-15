@@ -57,9 +57,6 @@
                 <a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= $link->url('post.index') ?>">Príspevky</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="<?= $link->url('home.about') ?>">O nás</a>
             </li>
             <li class="nav-item">
@@ -100,7 +97,6 @@
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.index') ?>">Domov</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.services') ?>">Služby a cenník</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a></li>
-      <li class="nav-item"><a class="nav-link" href="<?= $link->url('post.index') ?>">Príspevky</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.about') ?>">O nás</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.order') ?>">Rezervácia</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a></li>
@@ -109,7 +105,9 @@
     <?php if ($user->isLoggedIn()) { ?>
       <div class="offcanvas-user">
         <div class="mb-2">Prihlásený ako: <strong><?= htmlspecialchars($user->getName()) ?></strong></div>
-        <a class="btn btn-outline-secondary" href="<?= $link->url('auth.logout') ?>">Odhlásiť</a>
+        <div class="d-flex gap-2 flex-wrap">
+          <a class="btn btn-outline-secondary" href="<?= $link->url('auth.logout') ?>">Odhlásiť</a>
+        </div>
       </div>
     <?php } else { ?>
       <a class="btn btn-primary" href="<?= App\Configuration::LOGIN_URL ?>">Prihlásiť sa</a>
