@@ -18,8 +18,8 @@ $messages = $messages ?? [];
         </div>
     </div>
 
-    <div class="table-responsive admin-table-responsive">
-        <table class="table table-striped table-hover align-middle">
+    <div class="table-responsive admin-table-responsive table-card">
+        <table class="table table-striped table-hover align-middle" data-admin-messages-table>
             <thead>
             <tr>
                 <th>Dátum</th>
@@ -41,7 +41,7 @@ $messages = $messages ?? [];
                         <?= nl2br(htmlspecialchars((string)($m->message ?? ''))) ?>
                     </td>
                     <td class="text-end">
-                        <form action="<?= $link->url('admin.deleteMessage') ?>" method="post" class="d-inline" onsubmit="return confirm('Naozaj chcete vymazať túto správu?');">
+                        <form action="<?= $link->url('admin.deleteMessage') ?>" method="post" class="d-inline" data-ajax-delete-message onsubmit="return confirm('Naozaj chcete vymazať túto správu?');">
                             <input type="hidden" name="id" value="<?= (int)($m->id ?? 0) ?>">
                             <button type="submit" class="btn btn-sm btn-outline-danger">Vymazať</button>
                         </form>

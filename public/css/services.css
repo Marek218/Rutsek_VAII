@@ -29,8 +29,11 @@
     padding: 1.25rem;
     border-radius: 14px;
     border: 1px solid var(--lux-border);
-    background: #ffffff;
+    background: rgba(255,255,255,0.82);
     color: #0b1220;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.06);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
 .box .service-icon {
@@ -42,12 +45,12 @@
 .box h3 {
     margin: 0.3rem 0 0.5rem 0;
     font-size: 1.05rem;
-    color: var(--lux-accent-2);
+    color: #c85472; /* slightly softer than accent-2 */
 }
 
 .box .service-desc {
     margin: 0;
-    color: rgba(11,18,32,0.72);
+    color: rgba(11,18,32,0.68);
     font-size: 0.9rem;
 }
 
@@ -63,30 +66,29 @@
 .services-table {
     border-radius: 14px;
     overflow: hidden;
-    border: 1px solid var(--lux-border);
+    border: 1px solid var(--lux-table-border);
     background: var(--lux-surface);
 }
 
 .services-table thead th {
     background: var(--lux-table-head-bg);
-    color: var(--lux-text);
-    border-bottom: 1px solid var(--lux-border);
+    color: var(--lux-table-head-text);
+    border-bottom: 1px solid var(--lux-table-border);
 }
 
 .services-table tbody td {
-    border-top: 1px solid rgba(0,0,0,0.06);
+    color: var(--lux-table-text);
+    border-top: 1px solid var(--lux-table-border);
 }
 
+/* Dark mode: keep table readable, avoid too-dark cells */
 :root[data-theme="dark"] .services-table {
-    background: var(--lux-surface-2);
+    background: rgba(255,255,255,0.04);
 }
 
-:root[data-theme="dark"] .services-table tbody td {
-    border-top: 1px solid rgba(255,255,255,0.10);
+:root[data-theme="dark"] .services-table tbody tr > * {
+    background: transparent;
 }
-
-/* ZRUŠENÉ: hover farby na riadkoch tabuľky */
-/* (no hover styles) */
 
 /* ===== Admin: edit inputs ===== */
 .services-table input[type="text"] {
@@ -118,9 +120,14 @@
     border-color: rgba(96,165,250,0.55);
 }
 
-/* keep boxes white even in dark mode */
+/* keep boxes softly light even in dark mode (less harsh than pure white) */
 :root[data-theme="dark"] .box {
-    border-color: rgba(0,0,0,0.10);
-    background: #ffffff;
+    border-color: rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.86);
     color: #0b1220;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.30);
+}
+
+:root[data-theme="dark"] .box .service-desc {
+    color: rgba(11,18,32,0.70);
 }

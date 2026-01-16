@@ -77,6 +77,10 @@ class AdminController extends BaseController
             }
         }
 
+        if ($request->isAjax() || $request->wantsJson()) {
+            return new \Framework\Http\Responses\JsonResponse(['ok' => true, 'id' => $id]);
+        }
+
         return $this->redirect($this->url('admin.messages'));
     }
 

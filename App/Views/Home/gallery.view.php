@@ -216,7 +216,7 @@ $normalizePathUrl = function (?string $raw) {
                 <!-- caption removed on purpose (user requested no text under images) -->
 
                 <?php if ($isAdmin) { ?>
-                    <div class="p-2" style="background:#fff;">
+                    <div class="p-2">
                         <div class="small text-muted">#<?= (int)($item->id ?? 0) ?> • <?= htmlspecialchars((string)($item->path_url ?? '')) ?></div>
                     </div>
                 <?php } ?>

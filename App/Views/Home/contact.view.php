@@ -22,8 +22,8 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
 
     <div class="row">
         <div class="col-12 text-center mb-4">
-            <h1 class="display-6">Kontakt</h1>
-            <p class="lead">Kontaktujte nás pre objednávky alebo otázky — radi vám pomôžeme.</p>
+            <h1>Kontakt</h1>
+            <p>Kontaktujte nás pre objednávky alebo otázky — radi vám pomôžeme.</p>
 
             <?php if (isset($user) && $user->isLoggedIn()) { ?>
                 <div class="d-flex gap-2 justify-content-center flex-wrap mt-2">
@@ -104,7 +104,7 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                     </div>
                 <?php } ?>
 
-                <form method="post" action="<?= $link->url('home.contact') ?>">
+                <form method="post" action="<?= $link->url('home.contact') ?>" class="contact-form" data-ajax-contact="1">
                     <!-- Honeypot anti-spam: musí zostať prázdne -->
                     <label>
                         <input type="text" name="website" value="" style="position:absolute;left:-9999px;top:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -117,11 +117,6 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                             <?php if (!empty($errors['name'])) { ?><div class="invalid-feedback"><?= htmlspecialchars($errors['name']) ?></div><?php } ?>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="contact-phone" class="form-label">Telefón</label>
-                            <input id="contact-phone" type="tel" name="phone" class="form-control<?= !empty($errors['phone']) ? ' is-invalid' : '' ?>" placeholder="0903 842 887" value="<?= htmlspecialchars((string)($old['phone'] ?? '')) ?>" required>
-                            <?php if (!empty($errors['phone'])) { ?><div class="invalid-feedback"><?= htmlspecialchars($errors['phone']) ?></div><?php } ?>
-                        </div>
-                        <div class="col-12 col-md-6">
                             <label for="contact-email" class="form-label">Email</label>
                             <input id="contact-email" type="email" name="email" class="form-control<?= !empty($errors['email']) ? ' is-invalid' : '' ?>" value="<?= htmlspecialchars((string)($old['email'] ?? '')) ?>" required>
                             <?php if (!empty($errors['email'])) { ?><div class="invalid-feedback"><?= htmlspecialchars($errors['email']) ?></div><?php } ?>
@@ -131,10 +126,6 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                             <textarea id="contact-message" name="message" class="form-control<?= !empty($errors['message']) ? ' is-invalid' : '' ?>" rows="4" required><?= htmlspecialchars((string)($old['message'] ?? '')) ?></textarea>
                             <?php if (!empty($errors['message'])) { ?><div class="invalid-feedback"><?= htmlspecialchars($errors['message']) ?></div><?php } ?>
                         </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-3">
-                        <button type="submit" class="btn btn-primary">Odoslať správu</button>
-                        <a href="tel:+421903842887" class="btn btn-outline-secondary btn-call">Zavolať</a>
                     </div>
                 </form>
             </div>

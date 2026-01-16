@@ -22,6 +22,74 @@ class OrderController extends BaseController
         return $this->html();
     }
 
+    /**
+     * Returns true if requested slot [start, start+duration) overlaps any existing reservation on the same date.
+     */
+    private function hasOverlap(string $date, string $startTime, int $durationMinutes = 60): bool
+    {
+        // Normalize to HH:MM:SS
+        $startTime = preg_match('/^\d{2}:\d{2}:\d{2}$/', $startTime) ? $startTime : ($startTime . ':00');
+
+        $startTs = strtotime($date . ' ' . $startTime);
+        if ($startTs === false) return true;
+        $endTs = $startTs + ($durationMinutes * 60);
+
+        $orders = Order::getAll('`date` = ?', [$date]);
+        foreach ($orders as $o) {
+            $t = (string)($o->time ?? '');
+            if ($t === '') continue;
+            // assume stored as HH:MM:SS
+            $existingStart = strtotime($date . ' ' . $t);
+            if ($existingStart === false) continue;
+            $existingEnd = $existingStart + ($durationMinutes * 60);
+
+            // overlap if intervals intersect
+            if ($startTs < $existingEnd && $endTs > $existingStart) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * AJAX: checks whether given slot (date+time) is available.
+     * All services are treated as 60-minute blocks.
+     * GET /order/availability?date=YYYY-MM-DD&time=HH:MM
+     */
+    public function availability(Request $request): Response
+    {
+        $date = trim((string)$request->value('date'));
+        $time = trim((string)$request->value('time'));
+
+        $errors = [];
+        if ($date === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $errors['date'] = 'Neplatný dátum.';
+        }
+        if ($time === '' || !preg_match('/^\d{2}:\d{2}$/', $time)) {
+            $errors['time'] = 'Neplatný čas.';
+        }
+
+        if (!empty($errors)) {
+            return new JsonResponse(['ok' => false, 'available' => false, 'errors' => $errors], 400);
+        }
+
+        // Past date guard
+        $today = date('Y-m-d');
+        if ($date < $today) {
+            return new JsonResponse(['ok' => true, 'available' => false, 'reason' => 'Termín je v minulosti.'], 200);
+        }
+
+        $timeDb = $time . ':00';
+        $available = !$this->hasOverlap($date, $timeDb, 60);
+
+        return new JsonResponse([
+            'ok' => true,
+            'available' => $available,
+            'reason' => $available ? null : 'Tento termín je už obsadený.'
+        ]);
+    }
+
     // Handles booking form submission
 
     /**
@@ -42,15 +110,22 @@ class OrderController extends BaseController
         $time = trim((string)$request->value('time'));
         $notes = trim((string)$request->value('notes'));
 
+        $allowedServices = ['damske', 'panske', 'farbenie', 'trvala', 'melir', 'ucesy'];
+
         $errors = [];
-        // first name is required
         if ($first === '') { $errors['first_name'] = 'Meno je povinné.'; }
         if ($last === '') { $errors['last_name'] = 'Priezvisko je povinné.'; }
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $errors['email'] = 'Neplatný email.'; }
-        if ($phone === '') { $errors['phone'] = 'Telefón je povinný.'; }
-        if ($service === '') { $errors['service'] = 'Vyberte službu.'; }
-        if ($date === '') { $errors['date'] = 'Dátum je povinný.'; }
-        if ($time === '') { $errors['time'] = 'Čas je povinný.'; }
+        if ($phone === '' || !preg_match('/^[+0-9 ()-]{6,20}$/', $phone)) { $errors['phone'] = 'Neplatný telefón.'; }
+        if ($service === '' || !in_array($service, $allowedServices, true)) { $errors['service'] = 'Vyberte platnú službu.'; }
+        if ($date === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { $errors['date'] = 'Neplatný dátum.'; }
+        if ($time === '' || !preg_match('/^\d{2}:\d{2}$/', $time)) { $errors['time'] = 'Neplatný čas.'; }
+
+        // Past date guard
+        $today = date('Y-m-d');
+        if ($date !== '' && $date < $today) {
+            $errors['date'] = 'Dátum nemôže byť v minulosti.';
+        }
 
         if (!empty($errors)) {
             if ($request->isAjax()) {
@@ -60,8 +135,15 @@ class OrderController extends BaseController
             return $this->html(['errors' => $errors, 'old' => $request->post()], 'Home/order');
         }
 
-        if (preg_match('/^\d{2}:\d{2}$/', $time)) {
-            $time .= ':00';
+        $timeDb = $time . ':00';
+
+        // Collision check: 60-min block overlap on same date
+        if ($this->hasOverlap($date, $timeDb, 60)) {
+            $errors['time'] = 'Tento termín je už obsadený. Vyberte iný.';
+            if ($request->isAjax()) {
+                return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
+            }
+            return $this->html(['errors' => $errors, 'old' => $request->post()], 'Home/order');
         }
 
         $order = new Order();
@@ -71,7 +153,7 @@ class OrderController extends BaseController
         $order->phone = $phone;
         $order->service = $service;
         $order->date = $date;
-        $order->time = $time;
+        $order->time = $timeDb;
         $order->notes = $notes ?: null;
 
         try {
@@ -88,5 +170,49 @@ class OrderController extends BaseController
         }
 
         return $this->redirect($this->url('home.index'));
+    }
+
+    /**
+     * AJAX: returns the nearest available 60-min slot starting from given date+time.
+     * GET /order/nextAvailable?date=YYYY-MM-DD&time=HH:MM
+     */
+    public function nextAvailable(Request $request): Response
+    {
+        $date = trim((string)$request->value('date'));
+        $time = trim((string)$request->value('time'));
+
+        $errors = [];
+        if ($date === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $errors['date'] = 'Neplatný dátum.';
+        }
+        if ($time === '' || !preg_match('/^\d{2}:\d{2}$/', $time)) {
+            $errors['time'] = 'Neplatný čas.';
+        }
+        if (!empty($errors)) {
+            return new JsonResponse(['ok' => false, 'errors' => $errors], 400);
+        }
+
+        $startTs = strtotime($date . ' ' . $time . ':00');
+        if ($startTs === false) {
+            return new JsonResponse(['ok' => false, 'error' => 'Neplatný dátum/čas.'], 400);
+        }
+
+        // Search forward in 60-minute steps, up to 30 days
+        $limitSteps = 24 * 30;
+        $ts = $startTs;
+        for ($i = 0; $i < $limitSteps; $i++) {
+            $d = date('Y-m-d', $ts);
+            $t = date('H:i:s', $ts);
+            if (!$this->hasOverlap($d, $t, 60)) {
+                return new JsonResponse([
+                    'ok' => true,
+                    'date' => $d,
+                    'time' => substr($t, 0, 5)
+                ]);
+            }
+            $ts += 3600;
+        }
+
+        return new JsonResponse(['ok' => true, 'date' => null, 'time' => null, 'reason' => 'V najbližších 30 dňoch sa nenašiel voľný termín.']);
     }
 }

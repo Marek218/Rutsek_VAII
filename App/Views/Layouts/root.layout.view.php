@@ -29,7 +29,15 @@
     <link rel="stylesheet" href="<?= $link->asset('css/footer.css') ?>?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= $link->asset('css/utils.css') ?>?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= $link->asset('css/theme.css') ?>?v=<?= time() ?>">
-    <script src="<?= $link->asset('js/script.js') ?>" defer></script>
+    <link rel="stylesheet" href="<?= $link->asset('css/gallery.css') ?>?v=<?= time() ?>">
+
+    <script src="<?= $link->asset('js/theme.js') ?>" defer></script>
+    <script src="<?= $link->asset('js/admin-orders.js') ?>" defer></script>
+    <script src="<?= $link->asset('js/gallery.js') ?>" defer></script>
+    <script src="<?= $link->asset('js/gallery-errors.js') ?>" defer></script>
+    <script src="<?= $link->asset('js/order-ajax.js') ?>" defer></script>
+    <script src="<?= $link->asset('js/admin-messages.js') ?>" defer></script>
+    <script src="<?= $link->asset('js/contact-ajax.js') ?>" defer></script>
 
 
 

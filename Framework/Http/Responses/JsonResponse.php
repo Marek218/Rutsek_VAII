@@ -26,10 +26,12 @@ class JsonResponse extends Response
      *
      * @param mixed $data The data to be returned in the JSON response. This can be an array, an object, or any other
      * type that can be converted to JSON.
+     * @param int $statusCode Optional HTTP status code (default 200).
      */
-    public function __construct(mixed $data)
+    public function __construct(mixed $data, int $statusCode = 200)
     {
         $this->data = $data;
+        $this->setStatusCode($statusCode);
     }
 
     /**

@@ -1,32 +1,27 @@
 /* utils.css - pomocné triedy a responzívne utility */
 
-/* NOTE: Bootstrap už obsahuje grid a utility triedy.
-   Preto tu zámerne nedefinujeme .row, .col-*, .d-flex, .gap-*, .form-select, .visually-hidden.
-   Tento súbor obsahuje iba projektové (špecifické) štýly. */
+/* Minimal project-specific utilities (Bootstrap already provides most utilities). */
 
-/* Sort indicator in table headers - small arrow to show current sort direction */
+/* Sort indicator in table headers */
 th.sortable { position: relative; }
 th.sortable .sort-indicator {
     display: inline-block;
     margin-left: 0.5rem;
     font-size: 0.9rem;
-    color: #6b3d4f;
+    color: var(--lux-muted);
 }
 
-/* Optionally dim non-active sortable headers */
 th.sortable:not([data-order]) { opacity: 0.85; }
-th.sortable[data-order="asc"] { font-weight: 600; }
+th.sortable[data-order="asc"],
 th.sortable[data-order="desc"] { font-weight: 600; }
 
-/* Admin table: force horizontal scrolling on small screens */
+/* Admin tables: horizontal scroll on small screens */
 @media (max-width: 768px) {
     .admin-table-responsive {
-        overflow-x: auto; /* ensure horizontal scroll */
-        -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
-    .admin-table-responsive .table {
-        min-width: 680px; /* ensure table is wider than viewport to allow horizontal scroll */
-    }
+    .admin-table-responsive .table { min-width: 680px; }
 }
 
 /* Contact layout */
@@ -34,6 +29,20 @@ th.sortable[data-order="desc"] { font-weight: 600; }
 .contact-meta a { color: var(--lux-contact-link); text-decoration: none; }
 .contact-meta a:hover { color: var(--lux-link-hover); text-decoration: underline; }
 .btn-call { border-radius: 8px; padding: 0.45rem 0.85rem; }
+
+.contact-left .card,
+.contact-right .card,
+.contact-form-card .card {
+    background: var(--lux-surface) !important;
+    color: var(--lux-text);
+    border: 1px solid var(--lux-border);
+}
+
+.contact-left .text-muted { color: var(--lux-muted) !important; }
+
+:root[data-theme="dark"] .contact-left .card-body {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
 
 .contact-grid {
     display: grid;
@@ -45,86 +54,44 @@ th.sortable[data-order="desc"] { font-weight: 600; }
     .contact-grid { grid-template-columns: 420px 1fr; }
 }
 
-.contact-grid > * { width: 100%; }
-.contact-grid .card { height: 100%; }
-.contact-left img { width: 96px; max-width: 100%; height: auto; border-radius:8px; }
-.contact-left .card-body { padding: 1rem;
-background-color: #fff; box-shadow: 0 6px 18px rgba(51,43,40,0.06); border-radius: 10px; }
 .contact-form-card { margin-top: 1.25rem; }
 
-/* Gallery styles */
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-    gap: 1rem;
-    align-items: start;
+/* Tables: readability + card wrapper */
+.table { color: var(--lux-table-text); }
+
+:root[data-theme="dark"] .table,
+:root[data-theme="dark"] .table td,
+:root[data-theme="dark"] .table th {
+    color: var(--lux-table-text) !important;
 }
 
-.gallery-thumb {
-    border-radius: 10px;
+:root[data-theme="dark"] .table .text-muted { color: rgba(255,255,255,0.70) !important; }
+
+.table thead th {
+    background: var(--lux-table-head-bg);
+    color: var(--lux-table-head-text);
+    border-bottom-color: var(--lux-table-border) !important;
+}
+
+.table > :not(caption) > * > * { border-color: var(--lux-table-border) !important; }
+
+.table tbody > tr > * { background: var(--lux-table-row-even); }
+.table-striped > tbody > tr:nth-of-type(odd) > * { background: var(--lux-table-row-even-2); }
+
+.table-hover > tbody > tr:hover > * { background: var(--lux-table-hover) !important; }
+
+.table-card {
+    border: 1px solid var(--lux-table-border);
+    border-radius: 14px;
     overflow: hidden;
-    background: #fff;
-    box-shadow: 0 6px 18px rgba(51,43,40,0.06);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    height: 210px;
-    position: relative;
-}
-@media (max-width: 480px) {
-    .gallery-thumb { height: 160px; }
+    background: var(--lux-surface);
 }
 
-.gallery-thumb a {
-    display: block;
-    width: 100%;
-    height: 100%;
-    line-height: 0;
-    color: inherit;
-    text-decoration: none;
+:root[data-theme="dark"] .table-card {
+    background: rgba(12, 18, 32, 0.55);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.35);
 }
 
-.gallery-frame {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: relative;
-    background: #f3f3f3;
-}
-
-.gallery-frame img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-}
-
-.gallery-thumb:hover { transform: translateY(-6px); box-shadow: 0 10px 26px rgba(51,43,40,0.12); }
-.gallery-thumb:hover .gallery-frame img { transform: scale(1.06); transition: transform 0.35s ease; }
-
-.modal-backdrop.show {
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-
-.gallery-thumb.is-broken .gallery-frame img { filter: grayscale(1); opacity: 0.85; }
-
-.gallery-error {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 1rem;
-    text-align: center;
-    background: rgba(255,255,255,0.92);
-    color: #6b3d4f;
-}
-
-.price-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 0.75rem; }
-.price-item { background: #fff; padding: 0.6rem 0.75rem; border-radius: 8px; box-shadow: 0 6px 16px rgba(51,43,40,0.04); }
-.price-item h6 { margin: 0 0 0.25rem 0; font-size: 0.95rem; color: #332b28; }
-.price-item p { margin: 0; color: #6b3d4f; font-weight: 600; }
+.table-card .table { margin-bottom: 0; }
+.table a { color: var(--lux-link); }
+.table a:hover { color: var(--lux-link-hover); }
