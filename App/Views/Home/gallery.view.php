@@ -68,7 +68,7 @@ $normalizePathUrl = function (?string $raw) {
 
 <div class="row mb-4">
     <div class="col-12 text-center">
-        <h1 class="display-6">Galéria</h1>
+        <h1>Galéria</h1>
         <p class="lead">Prezerajte si naše práce</p>
     </div>
 </div>
@@ -145,25 +145,42 @@ $normalizePathUrl = function (?string $raw) {
 <?php } ?>
 
 <?php if (!$galleryError && !empty($galleryItems)) { ?>
-    <div class="gallery-grid">
+    <?php if ($isAdmin) { ?>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="text-muted small">Tip: Fotky môžeš presúvať myšou (drag & drop) a potom uložiť poradie.</div>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                id="gallerySaveOrderBtn"
+                data-gallery-reorder-save
+                data-reorder-endpoint="<?= htmlspecialchars($link->url('home.gallery')) ?>"
+                data-reorder-redirect="<?= htmlspecialchars($link->url('home.gallery', ['flash' => 'ok'])) ?>"
+            >
+                Uložiť poradie
+            </button>
+        </div>
+    <?php } ?>
+
+    <div
+        class="gallery-grid"
+        id="galleryGrid"
+        <?= $isAdmin ? ' data-admin-reorder="1"' : '' ?>
+        data-gallery-grid
+    >
         <?php foreach ($galleryItems as $item) {
             $path = $normalizePathUrl($item->path_url ?? null);
             if ($path === null) {
                 continue;
             }
 
-            // DB stores a local path relative to public/ (e.g. uploads/x.jpg)
             $imgUrl = $link->asset($path);
-
             $title = trim((string)($item->title ?? ''));
             if ($title === '') {
                 $title = 'Fotka #' . (int)($item->id ?? 0);
             }
-
-            $meta = trim((string)($item->category ?? ''));
             ?>
 
-            <div class="gallery-thumb" data-gallery-item>
+            <div class="gallery-thumb" data-gallery-item data-id="<?= (int)($item->id ?? 0) ?>"<?= $isAdmin ? ' draggable="true"' : '' ?>>
                 <?php if ($debug) { ?>
                     <div class="visually-hidden" aria-hidden="true">
                         id=<?= (int)($item->id ?? 0) ?>; path_url=<?= htmlspecialchars((string)($item->path_url ?? '')) ?>; normalized=<?= htmlspecialchars((string)$path) ?>; src=<?= htmlspecialchars($imgUrl) ?>
@@ -232,70 +249,3 @@ $normalizePathUrl = function (?string $raw) {
         </div>
     </div>
 </div>
-
-<style>
-    /* subtle blurred backdrop for nicer focus */
-    #galleryModal.modal { --bs-modal-backdrop-bg: rgba(15, 18, 25); --bs-modal-backdrop-opacity: .25; }
-
-    .gallery-admin-delete {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        z-index: 3;
-        margin: 0;
-    }
-    .gallery-admin-delete .btn {
-        border-radius: 999px;
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function(){
-
-         // Show error overlay when an image fails
-         document.querySelectorAll('[data-gallery-item] img[data-gallery-img]').forEach(function(img){
-             img.addEventListener('error', function(){
-                 try {
-                     var tile = img.closest('[data-gallery-item]');
-                     if (tile) {
-                         tile.classList.add('is-broken');
-                         var err = tile.querySelector('[data-gallery-error]');
-                         if (err) err.hidden = false;
-                     }
-                 } catch (e) {}
-             }, { once: true });
-         });
-
-         // Lightbox
-         var galleryModal = document.getElementById('galleryModal');
-         if (!galleryModal) return;
-
-         galleryModal.addEventListener('show.bs.modal', function (event) {
-             var trigger = event.relatedTarget;
-             if (!trigger) return;
-             var img = trigger.getAttribute('data-img');
-
-             var modalImg = document.getElementById('galleryModalImage');
-             if (modalImg) {
-                 modalImg.src = img || '';
-                 // keep alt meaningful, title is still used for accessibility, but not displayed
-                 modalImg.alt = trigger.getAttribute('data-title') || '';
-             }
-         });
-
-         galleryModal.addEventListener('hidden.bs.modal', function () {
-             var modalImg = document.getElementById('galleryModalImage');
-             if (modalImg) {
-                 modalImg.src = '';
-                 modalImg.alt = '';
-             }
-         });
-     });
-</script>

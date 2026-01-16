@@ -11,7 +11,6 @@ use App\Models\HomeBox;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
 use Framework\Http\Responses\JsonResponse;
-use Framework\Http\Responses\RedirectResponse;
 use Framework\Http\Responses\Response;
 use App\Configuration;
 
@@ -87,7 +86,6 @@ class HomeController extends BaseController
             $old = $request->post() ?: [];
 
             $name = trim((string)$request->value('name'));
-            $phone = trim((string)$request->value('phone'));
             $email = trim((string)$request->value('email'));
             $message = trim((string)$request->value('message'));
 
@@ -96,14 +94,14 @@ class HomeController extends BaseController
 
             if ($website !== '') {
                 // pretend success
+                if ($request->isAjax()) {
+                    return new JsonResponse(['ok' => true]);
+                }
                 return $this->redirect($this->url('home.contact', ['flash' => 'sent']));
             }
 
             if ($name === '' || mb_strlen($name) < 2) {
                 $errors['name'] = 'Meno musí mať aspoň 2 znaky.';
-            }
-            if ($phone === '' || mb_strlen($phone) < 6) {
-                $errors['phone'] = 'Telefón je povinný (min. 6 znakov).';
             }
             if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors['email'] = 'Zadajte platný email.';
@@ -116,7 +114,7 @@ class HomeController extends BaseController
                 try {
                     $msg = new ContactMessage();
                     $msg->name = $name;
-                    $msg->phone = $phone;
+                    $msg->phone = ''; // removed from form; keep DB column compatible
                     $msg->email = $email;
                     $msg->subject = trim((string)$request->value('subject')) ?: null;
                     $msg->message = $message;
@@ -125,10 +123,18 @@ class HomeController extends BaseController
                     $msg->is_read = 0;
                     $msg->save();
 
+                    if ($request->isAjax()) {
+                        return new JsonResponse(['ok' => true]);
+                    }
+
                     return $this->redirect($this->url('home.contact', ['flash' => 'sent']));
                 } catch (\Throwable $e) {
                     $errors['form'] = 'Správu sa nepodarilo uložiť. Skúste to prosím znova.';
                 }
+            }
+
+            if ($request->isAjax()) {
+                return new JsonResponse(['ok' => false, 'errors' => $errors ?: ['form' => 'Správu sa nepodarilo odoslať.']], 422);
             }
         }
 
@@ -192,6 +198,32 @@ class HomeController extends BaseController
             $mode = (string)($request->value('mode') ?? '');
 
             try {
+                if ($mode === 'reorder') {
+                    $order = $request->value('order') ?? [];
+                    if (!is_array($order)) { $order = []; }
+
+                    // normalize ids
+                    $ids = [];
+                    foreach ($order as $id) {
+                        $id = (int)$id;
+                        if ($id > 0) { $ids[] = $id; }
+                    }
+
+                    // write sort_order as 10,20,30... (room for manual inserts)
+                    $pos = 10;
+                    foreach ($ids as $id) {
+                        $item = Gallery::getOne($id);
+                        if ($item) {
+                            $item->sort_order = $pos;
+                            $item->save();
+                            $pos += 10;
+                        }
+                    }
+
+                    // For fetch() calls return 204 (no content)
+                    return new \Framework\Http\Responses\EmptyResponse(204);
+                }
+
                 if ($mode === 'upload') {
                     $file = $request->file('image');
                     if (!$file || !$file->isOk()) {
@@ -273,78 +305,5 @@ class HomeController extends BaseController
         }
 
         return $this->html(compact('galleryItems', 'galleryError', 'isAdmin', 'flash'));
-    }
-
-    /**
-     * Handles the order submission from the booking form.
-     * Persists into MariaDB `orders` table and redirects back to home with a flash-like query param.
-     */
-    public function orderSubmit(Request $request): Response
-    {
-        if (!$request->isPost()) {
-            return $this->redirect($this->url('home.order'));
-        }
-
-        // Basic server-side validation and normalization
-        $first = trim((string)$request->value('first_name'));
-        $last = trim((string)$request->value('last_name'));
-        $email = trim((string)$request->value('email'));
-        $phone = trim((string)$request->value('phone'));
-        $service = trim((string)$request->value('service'));
-        $date = trim((string)$request->value('date'));
-        $time = trim((string)$request->value('time'));
-        $notes = trim((string)$request->value('notes'));
-
-        // Minimal validation
-        $errors = [];
-        if ($first === '') { $errors['first_name'] = 'Meno je povinné.'; }
-        if ($last === '') { $errors['last_name'] = 'Priezvisko je povinné.'; }
-        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $errors['email'] = 'Neplatný email.'; }
-        if ($phone === '') { $errors['phone'] = 'Telefón je povinný.'; }
-        if ($service === '') { $errors['service'] = 'Vyberte službu.'; }
-        if ($date === '') { $errors['date'] = 'Dátum je povinný.'; }
-        if ($time === '') { $errors['time'] = 'Čas je povinný.'; }
-
-        if (!empty($errors)) {
-            // Return JSON errors if requested via XHR, else render order view with errors so user sees validation messages
-            if ($request->isAjax()) {
-                return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
-            }
-            // Non-AJAX: re-render the order page with validation errors and old input
-            return $this->html(['errors' => $errors, 'old' => $request->post()]);
-        }
-
-        // Normalize time to HH:MM:SS
-        if (preg_match('/^\d{2}:\d{2}$/', $time)) {
-            $time .= ':00';
-        }
-
-        $order = new Order();
-        $order->first_name = $first;
-        $order->last_name = $last;
-        $order->email = $email;
-        $order->phone = $phone;
-        $order->service = $service;
-        $order->date = $date;   // expects Y-m-d
-        $order->time = $time;   // expects HH:MM:SS
-        $order->notes = $notes ?: null;
-
-        // Persist using base Model::save()
-        try {
-            $order->save();
-        } catch (\Exception $e) {
-            // Return clear JSON error so developer can see the problem in Network tab
-            if ($request->isAjax() || $request->wantsJson()) {
-                return new JsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
-            }
-            // Non-AJAX: re-render order page with error message and old input so user sees problem
-            return $this->html(['error' => $e->getMessage(), 'old' => $request->post()]);
-        }
-
-        if ($request->isAjax()) {
-            return new JsonResponse(['ok' => true, 'id' => $order->id]);
-        }
-        // redirect after success
-        return $this->redirect($this->url('home.index'));
     }
 }

@@ -13,7 +13,6 @@ $error = $error ?? null;
 <div class="row">
     <div class="col">
         <h1>Objednanie</h1>
-        <p class="text-muted mb-0">Vyplňte formulár a my sa vám ozveme s potvrdením termínu.</p>
     </div>
 </div>
 
@@ -40,8 +39,12 @@ $error = $error ?? null;
 
 <div class="row">
     <div class="col-md-8 offset-md-2">
-        <!-- booking form: posts data to home.orderSubmit route for server-side processing -->
-        <form class="order-form" method="post" action="<?= $link->url('order.submit') ?>">
+        <!-- booking form: sends data to OrderController::submit (order.submit) -->
+        <form class="order-form" method="post" action="<?= $link->url('order.submit') ?>"
+              data-availability-url="<?= $link->url('order.availability') ?>"
+              data-availability-url-fallback="/order/availability"
+              data-next-available-url="<?= $link->url('order.nextAvailable') ?>"
+              data-next-available-url-fallback="/order/nextAvailable">
             <div class="row">
                 <!-- first name / last name -->
                 <div class="col-md-6 mb-3">
@@ -130,13 +133,15 @@ $error = $error ?? null;
                     <?php if (isset($errors['time'])) { ?>
                         <div class="form-text text-danger"><?= htmlspecialchars($errors['time']) ?></div>
                     <?php } ?>
+                    <div id="availabilityStatus" class="form-text"></div>
+                    <div id="nextAvailableStatus" class="form-text"></div>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="notes">Poznámka (voliteľné)</label>
                 <!-- textarea for optional notes (preferences, allergies, etc.) -->
-                <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Stručné informácie, napr. preferovaný kaderník alebo alergie"><?= htmlspecialchars($old['notes'] ?? '') ?></textarea>
+                <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Stručné informácie"><?= htmlspecialchars($old['notes'] ?? '') ?></textarea>
             </div>
 
             <div class="text-center mt-4">
@@ -144,10 +149,5 @@ $error = $error ?? null;
                 <button type="submit" class="btn btn-primary btn-lg">Poslať objednávku</button>
             </div>
         </form>
-
-        <div class="text-center mt-3">
-            <!-- back link -->
-            <a href="<?= $link->url('order.index') ?>">Späť na objednávky</a>
-        </div>
     </div>
 </div>
