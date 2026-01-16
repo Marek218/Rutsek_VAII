@@ -1,6 +1,7 @@
 <?php
 
 /** @var \Framework\Support\LinkGenerator $link */
+/** @var \Framework\Auth\AppUser $user */
 // Possible variables passed from controller: $errors (array), $old (array), $error (string)
 $errors = $errors ?? [];
 $old = $old ?? [];
@@ -11,9 +12,8 @@ $error = $error ?? null;
 <!-- Order page view: simple booking form for salon appointments -->
 <div class="row">
     <div class="col">
-        <h1>
-            Objednanie
-        </h1>
+        <h1>Objednanie</h1>
+        <p class="text-muted mb-0">Vyplňte formulár a my sa vám ozveme s potvrdením termínu.</p>
     </div>
 </div>
 

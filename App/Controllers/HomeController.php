@@ -5,6 +5,9 @@ namespace App\Controllers;
 use App\Models\Gallery;
 use App\Models\Order;
 use App\Models\Service;
+use App\Models\ContactMessage;
+use App\Models\ContactInfo;
+use App\Models\HomeBox;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
 use Framework\Http\Responses\JsonResponse;
@@ -45,7 +48,17 @@ class HomeController extends BaseController
      */
     public function index(Request $request): Response
     {
-        return $this->html();
+        // Homepage boxes loaded from DB (falls back to static defaults in the view)
+        $boxesByKey = [];
+        try {
+            $boxesByKey = HomeBox::getAllByKey();
+        } catch (\Throwable $e) {
+            $boxesByKey = [];
+        }
+
+        $isAdmin = $this->user->isLoggedIn();
+
+        return $this->html(compact('boxesByKey', 'isAdmin'));
     }
 
     /**
@@ -58,22 +71,83 @@ class HomeController extends BaseController
      */
     public function contact(Request $request): Response
     {
-        // Render the original contact view again.
-        return $this->html();
-    }
-
-
-    // Changed to accept Request to match router calling convention and ensure user detection works
-    public function order(Request $request): Response
-    {
-        // Use both controller-level user and app user to be robust
-        $appUser = $this->app->getAppUser();
-        if ($this->user->isLoggedIn() || $appUser->isLoggedIn()) {
-            $orders = Order::getAll(orderBy: '`created_at` DESC');
-            return $this->html(compact('orders'), 'Admin/index');
+        $contactInfo = null;
+        try {
+            $contactInfo = ContactInfo::getSingleton();
+        } catch (\Throwable $e) {
+            $contactInfo = null;
         }
 
-        return $this->html();
+        $flash = (string)($request->value('flash') ?? '');
+        $errors = [];
+        $old = [];
+
+        // Handle contact form submit
+        if ($request->isPost()) {
+            $old = $request->post() ?: [];
+
+            $name = trim((string)$request->value('name'));
+            $phone = trim((string)$request->value('phone'));
+            $email = trim((string)$request->value('email'));
+            $message = trim((string)$request->value('message'));
+
+            // simple honeypot (bot should fill it)
+            $website = trim((string)$request->value('website'));
+
+            if ($website !== '') {
+                // pretend success
+                return $this->redirect($this->url('home.contact', ['flash' => 'sent']));
+            }
+
+            if ($name === '' || mb_strlen($name) < 2) {
+                $errors['name'] = 'Meno musí mať aspoň 2 znaky.';
+            }
+            if ($phone === '' || mb_strlen($phone) < 6) {
+                $errors['phone'] = 'Telefón je povinný (min. 6 znakov).';
+            }
+            if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors['email'] = 'Zadajte platný email.';
+            }
+            if ($message === '' || mb_strlen($message) < 10) {
+                $errors['message'] = 'Správa musí mať aspoň 10 znakov.';
+            }
+
+            if (empty($errors)) {
+                try {
+                    $msg = new ContactMessage();
+                    $msg->name = $name;
+                    $msg->phone = $phone;
+                    $msg->email = $email;
+                    $msg->subject = trim((string)$request->value('subject')) ?: null;
+                    $msg->message = $message;
+                    $msg->ip = (string)($request->server('REMOTE_ADDR') ?? '');
+                    $msg->user_agent = (string)($request->server('HTTP_USER_AGENT') ?? '');
+                    $msg->is_read = 0;
+                    $msg->save();
+
+                    return $this->redirect($this->url('home.contact', ['flash' => 'sent']));
+                } catch (\Throwable $e) {
+                    $errors['form'] = 'Správu sa nepodarilo uložiť. Skúste to prosím znova.';
+                }
+            }
+        }
+
+        return $this->html(compact('contactInfo', 'flash', 'errors', 'old'));
+    }
+
+    public function order(Request $request): Response
+    {
+        // If admin is logged in, show all reservations.
+        $appUser = $this->app->getAppUser();
+        $isAdmin = $this->user->isLoggedIn() || $appUser->isLoggedIn();
+
+        if ($isAdmin) {
+            $orders = Order::getAll(orderBy: '`created_at` DESC');
+            return $this->html(compact('orders'), 'Admin/order');
+        }
+
+        // Otherwise show the public booking form.
+        return $this->html([], 'order');
     }
 
     public function services(Request $request): Response

@@ -8,6 +8,7 @@
 <div class="row">
     <div class="col">
         <h1>Naše služby a cenník</h1>
+        <p class="text-muted mb-0">Prehľad cien a úprav (admin môže ceny upraviť priamo v tabuľke).</p>
     </div>
 </div>
 
