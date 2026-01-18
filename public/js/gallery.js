@@ -2,7 +2,6 @@
     'use strict';
 
     // Simple helper to select and escape
-
     // Show a temporary toast message at top-right
     function toast(text, type = 'info', timeout = 2500) {
         try {
