@@ -2,10 +2,12 @@
 
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \Framework\Auth\AppUser $user */
+/** @var \App\Models\Service[] $services */
 // Possible variables passed from controller: $errors (array), $old (array), $error (string)
 $errors = $errors ?? [];
 $old = $old ?? [];
 $error = $error ?? null;
+$services = $services ?? [];
 
 ?>
 
@@ -49,7 +51,6 @@ $error = $error ?? null;
                 <!-- first name / last name -->
                 <div class="col-md-6 mb-3">
                     <label for="first_name">Meno</label>
-                    <!-- text input: customer's first name -->
                     <input id="first_name" name="first_name" type="text" required class="form-control"
                            placeholder="Jana" value="<?= htmlspecialchars($old['first_name'] ?? '') ?>">
                     <?php if (isset($errors['first_name'])) { ?>
@@ -58,7 +59,6 @@ $error = $error ?? null;
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="last_name">Priezvisko</label>
-                    <!-- text input: customer's last name (required) -->
                     <input id="last_name" name="last_name" type="text" required class="form-control"
                            placeholder="Nováková" value="<?= htmlspecialchars($old['last_name'] ?? '') ?>">
                     <?php if (isset($errors['last_name'])) { ?>
@@ -71,7 +71,6 @@ $error = $error ?? null;
                 <!-- contact: email and phone -->
                 <div class="col-md-6 mb-3">
                     <label for="email">Email</label>
-                    <!-- email input with basic HTML validation -->
                     <input id="email" name="email" type="email" required class="form-control"
                            placeholder="meno@priklad.sk" value="<?= htmlspecialchars($old['email'] ?? '') ?>">
                     <?php if (isset($errors['email'])) { ?>
@@ -80,7 +79,6 @@ $error = $error ?? null;
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="phone">Telefón</label>
-                    <!-- telephone input: pattern allows +, numbers, spaces, parentheses and hyphens -->
                     <input id="phone" name="phone" type="tel" required class="form-control"
                            placeholder="+421 900 000 000" pattern="[+0-9 ()-]{6,20}" value="<?= htmlspecialchars($old['phone'] ?? '') ?>">
                     <?php if (isset($errors['phone'])) { ?>
@@ -92,34 +90,27 @@ $error = $error ?? null;
             <div class="row">
                 <!-- service selection + date/time -->
                 <div class="col-md-6 mb-3">
-                    <label for="service">Služba</label>
-                    <!-- select: choose the requested service (required) -->
-                    <select id="service" name="service" class="form-select" required>
+                    <label for="service_id">Služba</label>
+                    <select id="service_id" name="service_id" class="form-select" required>
                         <option value="">Vyberte službu</option>
                         <?php
-                        $svcOld = $old['service'] ?? '';
-                        $options = [
-                            'damske' => 'Dámske strihy',
-                            'panske' => 'Pánske strihy',
-                            'farbenie' => 'Farbenie',
-                            'trvala' => 'Trvalá',
-                            'melir' => 'Melír',
-                            'ucesy' => 'Účesy na príležitosť'
-                        ];
-                        foreach ($options as $val => $label) {
-                            $sel = $svcOld === $val ? ' selected' : '';
-                            echo "<option value=\"" . htmlspecialchars($val) . "\"$sel>" . htmlspecialchars($label) . "</option>";
+                        $svcOld = (string)($old['service_id'] ?? '');
+                        foreach ($services as $svc) {
+                            $id = (int)($svc->id ?? 0);
+                            if ($id <= 0) { continue; }
+                            $sel = ($svcOld !== '' && (int)$svcOld === $id) ? ' selected' : '';
+                            $label = (string)($svc->name ?? '');
+                            echo "<option value=\"{$id}\"{$sel}>" . htmlspecialchars($label) . "</option>";
                         }
                         ?>
                     </select>
-                    <?php if (isset($errors['service'])) { ?>
-                        <div class="form-text text-danger"><?= htmlspecialchars($errors['service']) ?></div>
+                    <?php if (isset($errors['service_id'])) { ?>
+                        <div class="form-text text-danger"><?= htmlspecialchars($errors['service_id']) ?></div>
                     <?php } ?>
                 </div>
 
                 <div class="col-md-3 mb-3">
                     <label for="date">Dátum</label>
-                    <!-- date input: min set to today's date to prevent past bookings -->
                     <input id="date" name="date" type="date" required class="form-control"
                            min="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($old['date'] ?? '') ?>">
                     <?php if (isset($errors['date'])) { ?>
@@ -128,7 +119,6 @@ $error = $error ?? null;
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="time">Čas</label>
-                    <!-- time input: 15-minute steps (step=900) -->
                     <input id="time" name="time" type="time" required class="form-control" step="900" value="<?= htmlspecialchars($old['time'] ?? '') ?>">
                     <?php if (isset($errors['time'])) { ?>
                         <div class="form-text text-danger"><?= htmlspecialchars($errors['time']) ?></div>
@@ -140,14 +130,13 @@ $error = $error ?? null;
 
             <div class="mb-3">
                 <label for="notes">Poznámka (voliteľné)</label>
-                <!-- textarea for optional notes (preferences, allergies, etc.) -->
                 <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Stručné informácie"><?= htmlspecialchars($old['notes'] ?? '') ?></textarea>
             </div>
 
             <div class="text-center mt-4">
-                <!-- submit button: sends the booking -->
                 <button type="submit" class="btn btn-primary btn-lg">Poslať objednávku</button>
             </div>
         </form>
     </div>
 </div>
+

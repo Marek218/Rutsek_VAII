@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Order;
+use App\Models\Service;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
 use Framework\Http\Responses\JsonResponse;
@@ -18,8 +19,9 @@ class OrderController extends BaseController
     // Shows the booking form view
     public function index(Request $request): Response
     {
-        // Always show the public booking form; admin UI removed
-        return $this->html();
+        // Load services for select (1:N relationship: service -> many orders)
+        $services = Service::getAll(orderBy: '`name` ASC');
+        return $this->html(compact('services'));
     }
 
     /**
@@ -105,19 +107,17 @@ class OrderController extends BaseController
         $last = trim((string)$request->value('last_name'));
         $email = trim((string)$request->value('email'));
         $phone = trim((string)$request->value('phone'));
-        $service = trim((string)$request->value('service'));
+        $serviceId = (int)($request->value('service_id') ?? 0);
         $date = trim((string)$request->value('date'));
         $time = trim((string)$request->value('time'));
         $notes = trim((string)$request->value('notes'));
-
-        $allowedServices = ['damske', 'panske', 'farbenie', 'trvala', 'melir', 'ucesy'];
 
         $errors = [];
         if ($first === '') { $errors['first_name'] = 'Meno je povinné.'; }
         if ($last === '') { $errors['last_name'] = 'Priezvisko je povinné.'; }
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $errors['email'] = 'Neplatný email.'; }
         if ($phone === '' || !preg_match('/^[+0-9 ()-]{6,20}$/', $phone)) { $errors['phone'] = 'Neplatný telefón.'; }
-        if ($service === '' || !in_array($service, $allowedServices, true)) { $errors['service'] = 'Vyberte platnú službu.'; }
+        if ($serviceId <= 0) { $errors['service_id'] = 'Vyberte službu.'; }
         if ($date === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { $errors['date'] = 'Neplatný dátum.'; }
         if ($time === '' || !preg_match('/^\d{2}:\d{2}$/', $time)) { $errors['time'] = 'Neplatný čas.'; }
 
@@ -127,12 +127,21 @@ class OrderController extends BaseController
             $errors['date'] = 'Dátum nemôže byť v minulosti.';
         }
 
+        $service = null;
+        if ($serviceId > 0) {
+            $service = Service::getOne($serviceId);
+            if (!$service) {
+                $errors['service_id'] = 'Vyberte platnú službu.';
+            }
+        }
+
         if (!empty($errors)) {
             if ($request->isAjax()) {
                 return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
             }
             // Non-AJAX: re-render view with errors and old input
-            return $this->html(['errors' => $errors, 'old' => $request->post()], 'Home/order');
+            $services = Service::getAll(orderBy: '`name` ASC');
+            return $this->html(['errors' => $errors, 'old' => $request->post(), 'services' => $services], 'Home/order');
         }
 
         $timeDb = $time . ':00';
@@ -143,7 +152,8 @@ class OrderController extends BaseController
             if ($request->isAjax()) {
                 return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
             }
-            return $this->html(['errors' => $errors, 'old' => $request->post()], 'Home/order');
+            $services = Service::getAll(orderBy: '`name` ASC');
+            return $this->html(['errors' => $errors, 'old' => $request->post(), 'services' => $services], 'Home/order');
         }
 
         $order = new Order();
@@ -151,7 +161,9 @@ class OrderController extends BaseController
         $order->last_name = $last;
         $order->email = $email;
         $order->phone = $phone;
-        $order->service = $service;
+        $order->service_id = $serviceId;
+        // keep legacy `service` column filled with human readable name for old views
+        $order->service = (string)($service->name ?? '');
         $order->date = $date;
         $order->time = $timeDb;
         $order->notes = $notes ?: null;
@@ -162,7 +174,8 @@ class OrderController extends BaseController
             if ($request->isAjax()) {
                 return new JsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
             }
-            return $this->html(['error' => $e->getMessage(), 'old' => $request->post()], 'Home/order');
+            $services = Service::getAll(orderBy: '`name` ASC');
+            return $this->html(['error' => $e->getMessage(), 'old' => $request->post(), 'services' => $services], 'Home/order');
         }
 
         if ($request->isAjax()) {

@@ -17,6 +17,9 @@
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(0,0,0,0.06);
     box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
 :root[data-theme="dark"] .gallery-thumb {
@@ -104,20 +107,36 @@
     --bs-modal-backdrop-opacity: .25;
 }
 
-/* Admin delete button */
+/* Admin delete button overlay */
 .gallery-admin-delete {
     position: absolute;
     top: 8px;
     right: 8px;
     margin: 0;
+    z-index: 5;
 }
 
 .gallery-admin-delete .btn {
-    width: 32px;
+    width: 34px;
+    height: 34px;
     padding: 0;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+    display: inline-flex;
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    background: rgba(255,255,255,0.92);
+    color: #b00;
+    border: none;
+}
+:root[data-theme="dark"] .gallery-admin-delete .btn {
+    background: rgba(0,0,0,0.48);
+    color: #fff;
+}
+
+.gallery-admin-delete .btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.35);
 }
 
 /* DnD affordances for admin */
@@ -130,3 +149,28 @@
     border-radius: 12px;
     min-height: 180px;
 }
+
+/* Improve drag behavior on touch devices */
+#galleryGrid[data-admin-reorder="1"] {
+    touch-action: pan-y; /* allow vertical scrolling but capture horizontal/drag gestures */
+    -ms-touch-action: pan-y;
+}
+
+.gallery-thumb.is-dragging {
+    pointer-events: none;
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+/* ensure placeholder has reasonable min-height on small screens */
+#galleryGrid[data-admin-reorder="1"] .gallery-placeholder { min-height: 140px; }
+
+/* When admin reorder is active, disable anchor pointer-events so dragging is possible on the thumbnail; keep delete button clickable */
+#galleryGrid.admin-reorder-active .gallery-thumb a { pointer-events: none; }
+#galleryGrid.admin-reorder-active .gallery-admin-delete { pointer-events: auto; }
+
+/* ensure the delete button doesn't block click for lightbox on mobiles: pointer-events only on button */
+.gallery-thumb a { pointer-events: auto; }
+.gallery-admin-delete { pointer-events: auto; }
+
+/* End of edits */

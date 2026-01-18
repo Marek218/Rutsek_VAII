@@ -3,6 +3,8 @@
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \Framework\Auth\AppUser $user */
 /** @var \App\Models\Order $order */
+/** @var \App\Models\Service[] $services */
+$services = $services ?? [];
 ?>
 
 <div class="container">
@@ -30,10 +32,21 @@
             <label class="form-label" for="phone">Telefón</label>
             <input id="phone" type="text" name="phone" class="form-control" value="<?= htmlspecialchars($order->phone ?? '') ?>">
         </div>
+
         <div class="col-md-6">
-            <label class="form-label" for="service">Služba</label>
-            <input id="service" type="text" name="service" class="form-control" value="<?= htmlspecialchars($order->service ?? '') ?>">
+            <label class="form-label" for="service_id">Služba</label>
+            <select id="service_id" name="service_id" class="form-select">
+                <option value="">— vyberte —</option>
+                <?php foreach ($services as $svc) {
+                    $id = (int)($svc->id ?? 0);
+                    if ($id <= 0) continue;
+                    $sel = ((int)($order->service_id ?? 0) === $id) ? ' selected' : '';
+                    echo '<option value="' . $id . '"' . $sel . '>' . htmlspecialchars((string)($svc->name ?? '')) . '</option>';
+                } ?>
+            </select>
+            <div class="form-text text-muted">Ukladá sa FK do DB (orders.service_id). Textové pole service je už len kompatibilita.</div>
         </div>
+
         <div class="col-md-3">
             <label class="form-label" for="date">Dátum</label>
             <input id="date" type="date" name="date" class="form-control" value="<?= htmlspecialchars($order->date ?? '') ?>">

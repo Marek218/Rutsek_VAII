@@ -153,7 +153,14 @@ class HomeController extends BaseController
         }
 
         // Otherwise show the public booking form.
-        return $this->html([], 'order');
+        $services = [];
+        try {
+            $services = Service::getAll(orderBy: '`name` ASC');
+        } catch (\Throwable $e) {
+            $services = [];
+        }
+
+        return $this->html(compact('services'), 'order');
     }
 
     public function services(Request $request): Response
@@ -226,44 +233,46 @@ class HomeController extends BaseController
 
                 if ($mode === 'upload') {
                     $file = $request->file('image');
-                    if (!$file || !$file->isOk()) {
-                        return $this->redirect($this->url('home.gallery', ['flash' => 'uploaderror']));
+
+                    // robust log dir setup
+                    $varDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'var';
+                    $realVar = realpath($varDir);
+                    if ($realVar !== false) {
+                        $logDir = $realVar . DIRECTORY_SEPARATOR . 'log';
+                    } else {
+                        $logDir = $varDir . DIRECTORY_SEPARATOR . 'log';
+                    }
+                    if (!is_dir($logDir)) { @mkdir($logDir, 0777, true); }
+
+                    if (!$file) {
+                        $err = 'Nebol odoslaný žiadny súbor.';
+                        @file_put_contents($logDir . DIRECTORY_SEPARATOR . 'upload_errors.log', date('c') . " - " . ($_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN') . " - " . $err . PHP_EOL, FILE_APPEND);
+                        return $this->redirect($this->url('home.gallery', ['flash' => 'badfile', 'err' => $err]));
+                    }
+                    if (!$file->isOk()) {
+                        $errMsg = method_exists($file, 'getErrorMessage') ? $file->getErrorMessage() : 'Upload zlyhal.';
+                        @file_put_contents($logDir . DIRECTORY_SEPARATOR . 'upload_errors.log', date('c') . " - " . ($_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN') . " - " . $errMsg . PHP_EOL, FILE_APPEND);
+                        return $this->redirect($this->url('home.gallery', ['flash' => 'badfile', 'err' => $errMsg]));
                     }
 
-                    $origName = $file->getName();
-                    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
-                    if (!in_array($ext, ['png', 'jpg', 'jpeg'], true)) {
-                        return $this->redirect($this->url('home.gallery', ['flash' => 'badtype']));
+                    // Use FileUpload helper for validation and storage
+                    $res = \App\Support\FileUpload::storeGalleryFile($file, 'gallery');
+                    if (!$res['ok']) {
+                        $err = $res['error'] ?? 'Validation failed';
+                        @file_put_contents($logDir . DIRECTORY_SEPARATOR . 'upload_errors.log', date('c') . " - " . ($_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN') . " - " . $err . PHP_EOL, FILE_APPEND);
+                        // map common errors to flash keys, include message
+                        return $this->redirect($this->url('home.gallery', ['flash' => 'badfile', 'err' => $err]));
                     }
 
-                    $publicDir = realpath(__DIR__ . '/../../public');
-                    if ($publicDir === false) {
-                        return $this->redirect($this->url('home.gallery', ['flash' => 'nopublicdir']));
-                    }
-                    $uploadDir = rtrim($publicDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . Configuration::UPLOAD_DIR . 'gallery';
-                    if (!is_dir($uploadDir)) {
-                        @mkdir($uploadDir, 0777, true);
-                    }
-
-                    $random = bin2hex(random_bytes(8));
-                    $baseName = pathinfo($origName, PATHINFO_FILENAME);
-                    $baseName = preg_replace('~[^a-z0-9_-]+~i', '-', $baseName);
-                    $baseName = trim($baseName, '-');
-                    if ($baseName === '') { $baseName = 'image'; }
-
-                    $fileName = $baseName . '-' . date('Ymd-His') . '-' . $random . '.' . $ext;
-                    $targetPath = $uploadDir . DIRECTORY_SEPARATOR . $fileName;
-
-                    if (!$file->store($targetPath)) {
-                        return $this->redirect($this->url('home.gallery', ['flash' => 'storefail']));
-                    }
+                    $fileName = $res['filename'];
+                    $relPath = $res['path'];
 
                     $item = new Gallery();
                     $item->title = trim((string)$request->value('title')) ?: null;
                     $item->category = trim((string)$request->value('category')) ?: null;
                     $item->is_public = (int)($request->value('is_public') ?? 1);
                     $item->sort_order = (int)($request->value('sort_order') ?? 0);
-                    $item->path_url = 'uploads/gallery/' . $fileName;
+                    $item->path_url = ltrim($relPath, '/');
                     $item->save();
 
                     return $this->redirect($this->url('home.gallery', ['flash' => 'ok']));

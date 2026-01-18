@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\ContactMessage;
 use App\Models\ContactInfo;
 use App\Models\HomeBox;
+use App\Models\Service;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
 use Framework\Http\Responses\Response;
@@ -117,6 +118,8 @@ class AdminController extends BaseController
             return $this->redirect($this->url('admin.index'));
         }
 
+        $services = Service::getAll(orderBy: '`name` ASC');
+
         if ($request->isPost()) {
             // Minimal validation and normalization
             $order->first_name = trim((string)$request->value('first_name')) ?: $order->first_name;
@@ -126,7 +129,17 @@ class AdminController extends BaseController
                 $order->email = $email;
             }
             $order->phone   = trim((string)$request->value('phone')) ?: $order->phone;
-            $order->service = trim((string)$request->value('service')) ?: $order->service;
+
+            $serviceId = (int)($request->value('service_id') ?? 0);
+            if ($serviceId > 0) {
+                $svc = Service::getOne($serviceId);
+                if ($svc) {
+                    $order->service_id = $serviceId;
+                    // keep legacy service text in sync
+                    $order->service = (string)($svc->name ?? $order->service);
+                }
+            }
+
             $date = trim((string)$request->value('date'));
             if ($date !== '') { $order->date = $date; }
             $time = trim((string)$request->value('time'));
@@ -141,7 +154,7 @@ class AdminController extends BaseController
             return $this->redirect($this->url('admin.index'));
         }
 
-        return $this->html(['order' => $order], 'edit');
+        return $this->html(['order' => $order, 'services' => $services], 'edit');
     }
 
     /**

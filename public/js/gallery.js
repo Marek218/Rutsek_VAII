@@ -1,231 +1,242 @@
-// public/js/gallery.js
-// - Admin drag & drop reorder for gallery (saves sort_order via POST mode=reorder)
-// - Lightbox helper (Bootstrap modal) for gallery
-
 (function () {
     'use strict';
 
-    function findClosest(el, selector) {
-        if (el && el.nodeType === 3) el = el.parentElement;
-        if (el && typeof el.closest === 'function') return el.closest(selector);
-        while (el && el.nodeType === 1) {
-            if (el.matches && el.matches(selector)) return el;
-            el = el.parentElement;
-        }
-        return null;
-    }
+    // Simple helper to select and escape
 
-    function initGalleryLightbox() {
-        var galleryModal = document.getElementById('galleryModal');
-        if (!galleryModal) return;
-
-        galleryModal.addEventListener('show.bs.modal', function (event) {
-            var trigger = event.relatedTarget;
-            if (!trigger) return;
-            var img = trigger.getAttribute('data-img');
-
-            var modalImg = document.getElementById('galleryModalImage');
-            if (modalImg) {
-                modalImg.src = img || '';
-                modalImg.alt = trigger.getAttribute('data-title') || '';
-            }
-        });
-
-        galleryModal.addEventListener('hidden.bs.modal', function () {
-            var modalImg = document.getElementById('galleryModalImage');
-            if (modalImg) {
-                modalImg.src = '';
-                modalImg.alt = '';
-            }
-        });
-    }
-
-    function initGalleryReorder() {
-        var grid = document.querySelector('[data-gallery-grid][data-admin-reorder="1"]');
-        if (!grid) return;
-
-        var saveBtn = document.querySelector('[data-gallery-reorder-save]');
-        if (!saveBtn) return;
-
-        var endpoint = saveBtn.getAttribute('data-reorder-endpoint') || '';
-        var redirectUrl = saveBtn.getAttribute('data-reorder-redirect') || '';
-        if (!endpoint) return;
-
-        var isDragging = false;
-        var draggedEl = null;
-
-        var placeholder = document.createElement('div');
-        placeholder.className = 'gallery-thumb gallery-placeholder';
-        placeholder.setAttribute('aria-hidden', 'true');
-
-        function tiles() {
-            return Array.prototype.slice.call(grid.querySelectorAll('[data-gallery-item][data-id]'));
-        }
-
-        function getClosestTile(x, y) {
-            var list = tiles().filter(function (t) { return t !== draggedEl; });
-            var best = null;
-            var bestDist = Infinity;
-            list.forEach(function (t) {
-                var r = t.getBoundingClientRect();
-                var cx = r.left + r.width / 2;
-                var cy = r.top + r.height / 2;
-                var dx = cx - x;
-                var dy = cy - y;
-                var d = dx * dx + dy * dy;
-                if (d < bestDist) { bestDist = d; best = t; }
-            });
-            return best;
-        }
-
-        function insertPlaceholderNear(target, x) {
-            if (!target) return;
-            var r = target.getBoundingClientRect();
-            var before = (x - r.left) < (r.width / 2);
-            if (before) {
-                grid.insertBefore(placeholder, target);
-            } else {
-                grid.insertBefore(placeholder, target.nextSibling);
-            }
-        }
-
-        function collectOrder() {
-            return tiles()
-                .filter(function (t) { return t !== placeholder; })
-                .map(function (t) { return parseInt(t.getAttribute('data-id') || '0', 10); })
-                .filter(function (id) { return id > 0; });
-        }
-
-        function postOrder(orderIds) {
-            var body = 'mode=reorder';
-            orderIds.forEach(function (id) { body += '&order[]=' + encodeURIComponent(String(id)); });
-
-            return fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-                body: body,
-                credentials: 'same-origin'
-            }).then(function (res) {
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                return res.text();
-            });
-        }
-
-        // Prevent modal open while dragging
-        grid.addEventListener('click', function (e) {
-            if (!isDragging) return;
-            var a = findClosest(e.target, 'a[data-bs-toggle="modal"]');
-            if (a) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        }, true);
-
-        function resetDraggedEl(el) {
-            el.style.position = '';
-            el.style.left = '';
-            el.style.top = '';
-            el.style.zIndex = '';
-            el.style.pointerEvents = '';
-            el.style.width = '';
-            el.style.height = '';
-            el.classList.remove('is-dragging');
-        }
-
-        function finishDrag() {
-            if (!isDragging || !draggedEl) return;
-
-            resetDraggedEl(draggedEl);
-            grid.insertBefore(draggedEl, placeholder);
-
-            placeholder.remove();
-            placeholder = document.createElement('div');
-            placeholder.className = 'gallery-thumb gallery-placeholder';
-            placeholder.setAttribute('aria-hidden', 'true');
-
-            isDragging = false;
-            draggedEl = null;
-        }
-
-        function attachHandlers() {
-            tiles().forEach(function (tile) {
-                tile.removeAttribute('draggable');
-
-                tile.addEventListener('pointerdown', function (e) {
-                    // only primary button
-                    if (e.button !== 0) return;
-                    // ignore delete button/form clicks
-                    if (findClosest(e.target, 'button') || findClosest(e.target, 'form')) return;
-
-                    isDragging = true;
-                    draggedEl = tile;
-                    draggedEl.classList.add('is-dragging');
-
-                    // placeholder where tile was
-                    grid.insertBefore(placeholder, draggedEl.nextSibling);
-
-                    // fixed positioning so it follows pointer
-                    var rect = draggedEl.getBoundingClientRect();
-                    draggedEl.dataset.origWidth = String(rect.width);
-                    draggedEl.style.width = rect.width + 'px';
-                    draggedEl.style.height = rect.height + 'px';
-                    draggedEl.style.position = 'fixed';
-                    draggedEl.style.left = rect.left + 'px';
-                    draggedEl.style.top = rect.top + 'px';
-                    draggedEl.style.zIndex = '9999';
-                    draggedEl.style.pointerEvents = 'none';
-
-                    try { draggedEl.setPointerCapture(e.pointerId); } catch (err) {}
-                    e.preventDefault();
-                }, { passive: false });
-            });
-        }
-
-        attachHandlers();
-
-        window.addEventListener('pointermove', function (e) {
-            if (!isDragging || !draggedEl) return;
-
-            var w = parseFloat(draggedEl.dataset.origWidth || '0') || draggedEl.getBoundingClientRect().width;
-            draggedEl.style.left = (e.clientX - w / 2) + 'px';
-            draggedEl.style.top = (e.clientY - 40) + 'px';
-
-            var target = getClosestTile(e.clientX, e.clientY);
-            insertPlaceholderNear(target, e.clientX);
-        }, { passive: true });
-
-        window.addEventListener('pointerup', finishDrag, { passive: true });
-        window.addEventListener('pointercancel', finishDrag, { passive: true });
-
-        saveBtn.addEventListener('click', function () {
-            var ids = collectOrder();
-            if (ids.length === 0) return;
-
-            saveBtn.disabled = true;
-            var original = saveBtn.textContent;
-            saveBtn.textContent = 'Ukladám...';
-
-            postOrder(ids)
-                .then(function () {
-                    if (redirectUrl) {
-                        window.location.href = redirectUrl;
-                    } else {
-                        window.location.reload();
-                    }
-                })
-                .catch(function () {
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = original || 'Uložiť poradie';
-                    alert('Poradie sa nepodarilo uložiť.');
-                });
-        });
+    // Show a temporary toast message at top-right
+    function toast(text, type = 'info', timeout = 2500) {
+        try {
+            var t = document.createElement('div');
+            t.className = 'gallery-toast alert alert-' + (type === 'error' ? 'danger' : (type === 'success' ? 'success' : 'secondary'));
+            t.style.position = 'fixed';
+            t.style.right = '12px';
+            t.style.top = (12 + (document.querySelectorAll('.gallery-toast').length * 48)) + 'px';
+            t.style.zIndex = 1200;
+            t.style.minWidth = '180px';
+            t.style.opacity = '0.98';
+            t.textContent = text;
+            document.body.appendChild(t);
+            setTimeout(function () { t.remove(); }, timeout);
+        } catch (e) { console.log('toast failed', e); }
     }
 
     function init() {
-        initGalleryLightbox();
-        initGalleryReorder();
+        var grid = document.getElementById('galleryGrid');
+        if (!grid) return; // no gallery on page
+
+        // Debug overlay when ?debug=1
+        var debugMode = window.location.search.indexOf('debug=1') !== -1;
+        var dbgEl = null;
+        function createDebug() {
+            dbgEl = document.createElement('div');
+            dbgEl.style.position = 'fixed'; dbgEl.style.left = '12px'; dbgEl.style.bottom = '12px'; dbgEl.style.zIndex = '999999';
+            dbgEl.style.background = 'rgba(0,0,0,0.75)'; dbgEl.style.color = '#fff'; dbgEl.style.padding = '8px 10px'; dbgEl.style.fontSize = '12px'; dbgEl.style.borderRadius = '6px';
+            dbgEl.id = 'gallery-debug-overlay';
+            dbgEl.innerHTML = '<strong>Gallery DnD debug</strong><div id="gd-body">init...</div>';
+            document.body.appendChild(dbgEl);
+        }
+        function updateDebug(txt) { if (!debugMode) return; if (!dbgEl) createDebug(); var b = document.getElementById('gd-body'); if (b) b.innerHTML = txt.replace(/\n/g,'<br>'); }
+
+        updateDebug('grid: ' + (!!grid));
+
+        // Only activate reorder when server marked admin or when data-admin-reorder present
+        var adminFlag = grid.getAttribute('data-admin-reorder') === '1';
+        if (!adminFlag) {
+            updateDebug('adminFlag: false — drag disabled');
+            return; // not admin, nothing to do
+        }
+        updateDebug('adminFlag: true');
+        // add a class to the grid to toggle CSS that disables anchor pointer-events while reordering
+        grid.classList.add('admin-reorder-active');
+
+        var endpoint = grid.getAttribute('data-reorder-endpoint') || '';
+        updateDebug('endpoint: ' + (endpoint || '(none)'));
+
+        var dragging = null; // element being dragged
+        var placeholder = document.createElement('div');
+        placeholder.className = 'gallery-thumb gallery-placeholder';
+        placeholder.style.minHeight = '120px';
+
+        // pointer state
+        var pointerId = null;
+
+        function tiles() { return Array.from(grid.querySelectorAll('[data-gallery-item]')); }
+
+        function getTileRect(el) { return el.getBoundingClientRect(); }
+
+        var eventsCount = { down:0, move:0, up:0 };
+
+        function onStart(e, tile) {
+            // Prevent starting when clicking controls
+            if (e.target && (e.target.closest && e.target.closest('form,button'))) return;
+            e.preventDefault && e.preventDefault();
+            dragging = tile;
+            dragging.classList.add('is-dragging');
+            dragging.classList.add('dragging-active');
+
+            var r = getTileRect(tile);
+            // set fixed size/position so it can move
+            dragging.style.width = r.width + 'px';
+            dragging.style.height = r.height + 'px';
+            dragging.style.position = 'fixed';
+            dragging.style.left = r.left + 'px';
+            dragging.style.top = r.top + 'px';
+            dragging.style.zIndex = 9999;
+            dragging.style.pointerEvents = 'none';
+
+            // insert placeholder
+            tile.parentNode.insertBefore(placeholder, tile.nextSibling);
+
+            // capture pointerId for pointer events
+            if (e.pointerId) {
+                pointerId = e.pointerId;
+                try { if (dragging.setPointerCapture) dragging.setPointerCapture(pointerId); } catch (er) {}
+            }
+            eventsCount.down++;
+            updateDebug('tiles=' + tiles().length + '\ndown=' + eventsCount.down + ' move=' + eventsCount.move + ' up=' + eventsCount.up);
+        }
+
+        function moveAt(clientX, clientY) {
+            if (!dragging) return;
+            eventsCount.move++;
+            var w = dragging.offsetWidth;
+            dragging.style.left = (clientX - w / 2) + 'px';
+            dragging.style.top = (clientY - 40) + 'px';
+
+            // find closest tile center
+            var candidates = tiles().filter(function (t) { return t !== dragging && t !== placeholder; });
+            var best = null; var bestDist = Infinity;
+            candidates.forEach(function (c) {
+                var r = c.getBoundingClientRect();
+                var cx = r.left + r.width/2; var cy = r.top + r.height/2;
+                var dx = cx - clientX; var dy = cy - clientY; var d = dx*dx + dy*dy;
+                if (d < bestDist) { bestDist = d; best = c; }
+            });
+            if (!best) { updateDebug('move count=' + eventsCount.move); return; }
+            var r = best.getBoundingClientRect();
+            var before = (clientX - r.left) < (r.width/2);
+            if (before) {
+                best.parentNode.insertBefore(placeholder, best);
+            } else {
+                best.parentNode.insertBefore(placeholder, best.nextSibling);
+            }
+            updateDebug('tiles=' + tiles().length + '\ndown=' + eventsCount.down + ' move=' + eventsCount.move + ' up=' + eventsCount.up);
+        }
+
+        function onEnd() {
+            if (!dragging) return;
+            eventsCount.up++;
+            // place dragging element to placeholder position
+            try { placeholder.parentNode.insertBefore(dragging, placeholder); } catch (e) { console.warn('insert failed', e); }
+            // reset styles
+            try { if (pointerId && dragging.releasePointerCapture) dragging.releasePointerCapture(pointerId); } catch (er) {}
+            dragging.style.position = '';
+            dragging.style.left = '';
+            dragging.style.top = '';
+            dragging.style.width = '';
+            dragging.style.height = '';
+            dragging.style.zIndex = '';
+            dragging.style.pointerEvents = '';
+            dragging.classList.remove('is-dragging');
+            dragging.classList.remove('dragging-active');
+
+            // remove placeholder
+            placeholder.remove();
+
+            // collect order and save
+            var ids = tiles().map(function (t) { return t.getAttribute('data-id'); });
+            if (endpoint) saveOrder(ids);
+            else toast('Poradie zmenené (neuložené) – endpoint chýba', 'error');
+
+            dragging = null;
+            pointerId = null;
+            updateDebug('tiles=' + tiles().length + '\ndown=' + eventsCount.down + ' move=' + eventsCount.move + ' up=' + eventsCount.up);
+            try { grid.classList.remove('admin-reorder-active'); } catch (e) {}
+        }
+
+        function saveOrder(ids) {
+            if (!endpoint) return Promise.reject(new Error('no endpoint'));
+            var body = 'mode=reorder';
+            ids.forEach(function (id) { body += '&order[]=' + encodeURIComponent(id); });
+            return fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                credentials: 'same-origin',
+                body: body
+            }).then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                toast('Poradie uložené', 'success');
+                return res.text();
+            }).catch(function (err) {
+                console.error('saveOrder failed', err);
+                toast('Uloženie poradia zlyhalo', 'error');
+            });
+        }
+
+        // Attach handlers per tile
+        function attach() {
+            tiles().forEach(function (tile) {
+                // Use pointer events when available
+                tile.addEventListener('pointerdown', function (ev) {
+                    // only primary button (or touch)
+                    if (typeof ev.button === 'number' && ev.button !== 0) return;
+                    onStart(ev, tile);
+                }, { passive: false, capture: true });
+
+                // mouse fallback
+                tile.addEventListener('mousedown', function (ev) {
+                    if (ev.button !== 0) return;
+                    onStart(ev, tile);
+                }, { passive: false, capture: true });
+
+                // touch fallback (use first touch)
+                tile.addEventListener('touchstart', function (ev) {
+                    var t = ev.touches && ev.touches[0]; if (!t) return;
+                    // craft a minimal event-like object
+                    var fake = { button: undefined, pointerId: undefined, clientX: t.clientX, clientY: t.clientY, target: ev.target, preventDefault: function(){ ev.preventDefault(); } };
+                    onStart(fake, tile);
+                }, { passive: false, capture: true });
+            });
+
+            // movement handlers on window
+            window.addEventListener('pointermove', function (ev) {
+                if (!dragging) return;
+                ev.preventDefault && ev.preventDefault();
+                moveAt(ev.clientX, ev.clientY);
+            }, { passive: false });
+
+            window.addEventListener('mousemove', function (ev) {
+                if (!dragging) return;
+                ev.preventDefault && ev.preventDefault();
+                moveAt(ev.clientX, ev.clientY);
+            }, { passive: false });
+
+            window.addEventListener('touchmove', function (ev) {
+                if (!dragging) return;
+                var t = ev.touches && ev.touches[0]; if (!t) return;
+                moveAt(t.clientX, t.clientY);
+                ev.preventDefault();
+            }, { passive: false });
+
+            window.addEventListener('pointerup', function () { onEnd(); }, { passive: true });
+            window.addEventListener('mouseup', function () { onEnd(); }, { passive: true });
+            window.addEventListener('touchend', function () { onEnd(); }, { passive: true });
+        }
+
+        attach();
+
+        // small CSS safety in case it's missing
+        try {
+            var style = document.createElement('style');
+            style.textContent = '\n.gallery-thumb.dragging-active{box-shadow: 0 18px 40px rgba(0,0,0,0.35);opacity:0.95;transform:translateZ(0);}\n.gallery-placeholder{background:rgba(60,120,255,0.06);border:2px dashed rgba(60,120,255,0.35);border-radius:10px;}\n.gallery-toast{transition:opacity .2s;}\n';
+            document.head.appendChild(style);
+        } catch (e) {}
+
+        // done
+        console.log('Gallery reorder initialized (admin mode).');
     }
 
+    // Init on DOM ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

@@ -19,6 +19,7 @@ $flashMessages = [
     'storefail' => ['type' => 'danger', 'text' => 'Súbor sa nepodarilo uložiť na server.'],
     'nopublicdir' => ['type' => 'danger', 'text' => 'Nenašiel som public/ adresár (chybná konfigurácia projektu).'],
     'exception' => ['type' => 'danger', 'text' => 'Nastala chyba pri spracovaní galérie.'],
+    'badfile' => ['type' => 'danger', 'text' => 'Súbor neprešiel validáciou.'],
 ];
 
 $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
@@ -52,14 +53,19 @@ $normalizePathUrl = function (?string $raw) {
     // Normalize slashes for URL
     $path = str_replace('\\', '/', $path);
 
-    // If no extension, try common image extensions
+    // If no extension, try to find existing file under public/ with common image extensions
     if (!preg_match('~\.(png|jpe?g|webp|gif)$~i', $path)) {
-        foreach (['.jpg', '.png', '.jpeg', '.webp'] as $ext) {
-            // We can't truly check file existence here reliably in all envs,
-            // but we can at least generate a valid candidate.
-            // The browser will request it and show overlay if missing.
-            return $path . $ext;
+        $publicDir = realpath(__DIR__ . '/../../public');
+        if ($publicDir !== false) {
+            foreach (['.jpg', '.png', '.jpeg', '.webp'] as $ext) {
+                $candidate = rtrim($publicDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path . $ext);
+                if (is_file($candidate)) {
+                    return str_replace('\\', '/', $path . $ext);
+                }
+            }
         }
+        // fallback: return with .jpg so browser can still try to load something
+        return $path . '.jpg';
     }
 
     return $path;
@@ -83,7 +89,13 @@ $normalizePathUrl = function (?string $raw) {
 
             <?php if ($flash !== '' && isset($flashMessages[$flash])) {
                 $m = $flashMessages[$flash]; ?>
-                <div class="alert alert-<?= htmlspecialchars($m['type']) ?> mb-3"><?= htmlspecialchars($m['text']) ?></div>
+                <div class="alert alert-<?= htmlspecialchars($m['type']) ?> mb-3"><?php
+                    echo htmlspecialchars($m['text']);
+                    // if there's a specific error message (err) from validation, show it (sanitized)
+                    if (isset($_GET['err']) && trim((string)$_GET['err']) !== '') {
+                        echo '<div class="mt-2"><small class="text-muted">' . htmlspecialchars((string)$_GET['err']) . '</small></div>';
+                    }
+                ?></div>
             <?php } ?>
 
             <form method="post" action="<?= $link->url('home.gallery') ?>" enctype="multipart/form-data" class="row g-3">
@@ -120,11 +132,8 @@ $normalizePathUrl = function (?string $raw) {
                 <div class="col-12">
                     <label class="form-label">Obrázok (PNG/JPG)</label>
                     <div class="d-flex gap-2 align-items-center flex-wrap">
-                        <label class="btn btn-primary mb-0" style="cursor:pointer;">
-                            +
-                            <input type="file" name="image" accept="image/png,image/jpeg" hidden required>
-                        </label>
-                        <button type="submit" class="btn btn-outline-secondary">Nahrať</button>
+                        <input type="file" name="image" accept="image/png,image/jpeg" class="form-control form-control-file" required>
+                        <button type="submit" class="btn btn-primary">Nahrať</button>
                         <span class="text-muted small">Súbor sa uloží do <code>public/uploads/gallery</code> a do DB do <code>path_url</code>.</span>
                     </div>
                 </div>
@@ -145,27 +154,12 @@ $normalizePathUrl = function (?string $raw) {
 <?php } ?>
 
 <?php if (!$galleryError && !empty($galleryItems)) { ?>
-    <?php if ($isAdmin) { ?>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="text-muted small">Tip: Fotky môžeš presúvať myšou (drag & drop) a potom uložiť poradie.</div>
-            <button
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                id="gallerySaveOrderBtn"
-                data-gallery-reorder-save
-                data-reorder-endpoint="<?= htmlspecialchars($link->url('home.gallery')) ?>"
-                data-reorder-redirect="<?= htmlspecialchars($link->url('home.gallery', ['flash' => 'ok'])) ?>"
-            >
-                Uložiť poradie
-            </button>
-        </div>
-    <?php } ?>
-
     <div
         class="gallery-grid"
         id="galleryGrid"
         <?= $isAdmin ? ' data-admin-reorder="1"' : '' ?>
         data-gallery-grid
+        <?= $isAdmin ? (' data-reorder-endpoint="' . htmlspecialchars($link->url('home.gallery')) . '" data-reorder-redirect="' . htmlspecialchars($link->url('home.gallery', ['flash' => 'ok'])) . '"') : '' ?>
     >
         <?php foreach ($galleryItems as $item) {
             $path = $normalizePathUrl($item->path_url ?? null);
@@ -249,3 +243,16 @@ $normalizePathUrl = function (?string $raw) {
         </div>
     </div>
 </div>
+
+<?php if ($isAdmin && $debug) {
+    $logFile = realpath(__DIR__ . '/../../var/log/upload_errors.log');
+    if ($logFile && is_file($logFile) && is_readable($logFile)) {
+        $lines = @file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+        $last = array_slice($lines, -40);
+        echo '<div class="alert alert-secondary"><strong>Debug – posledné záznamy upload_errors.log:</strong><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;padding:0.5rem;margin-top:.5rem;">' . htmlspecialchars(implode("\n", $last)) . '</pre></div>';
+    } else {
+        echo '<div class="alert alert-secondary"><strong>Debug:</strong> upload_errors.log nenájdený (uistite sa, že adresár var/log existuje a má zápis).</div>';
+    }
+    echo '<div class="small text-muted">Tip: Ak nahrávanie zlyhá, skontrolujte nastavenia PHP <code>upload_max_filesize</code> a <code>post_max_size</code> a práva adresára <code>public/uploads/gallery</code>. Max veľkosť uploadu nastavená v aplikácii: 5 MB.</div>';
+}
+?>

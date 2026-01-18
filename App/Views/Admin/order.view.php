@@ -36,12 +36,17 @@ $orders = $orders ?? [];
             </tr>
             </thead>
             <tbody>
-            <?php if (!empty($orders)) { foreach ($orders as $o) { ?>
+            <?php if (!empty($orders)) { foreach ($orders as $o) {
+                $serviceLabel = trim((string)($o->service ?? ''));
+                if ($serviceLabel === '' && !empty($o->service_id)) {
+                    $serviceLabel = 'ID: ' . (int)$o->service_id;
+                }
+                ?>
                 <tr>
                     <td><?= htmlspecialchars(($o->first_name ?? '') . ' ' . ($o->last_name ?? '')) ?></td>
                     <td><a href="mailto:<?= htmlspecialchars($o->email ?? '') ?>"><?= htmlspecialchars($o->email ?? '') ?></a></td>
                     <td><a href="tel:<?= htmlspecialchars($o->phone ?? '') ?>"><?= htmlspecialchars($o->phone ?? '') ?></a></td>
-                    <td><?= htmlspecialchars($o->service ?? '') ?></td>
+                    <td><?= htmlspecialchars($serviceLabel) ?></td>
                     <td><?= htmlspecialchars($o->date ?? '') ?></td>
                     <td><?= htmlspecialchars(substr((string)$o->time, 0, 5)) ?></td>
                     <td class="text-end">

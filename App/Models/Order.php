@@ -19,10 +19,15 @@ class Order extends Model
     public ?string $last_name = null;
     public ?string $email = null;
     public ?string $phone = null;
+
+    // Legacy text field (kept for backward compatibility)
     public ?string $service = null;
+
+    // New FK to services.id (real 1:N relationship)
+    public ?int $service_id = null;
+
     public ?string $date = null;  // store as DATE (Y-m-d)
     public ?string $time = null;  // store as TIME (HH:MM:SS)
     public ?string $notes = null;
     public ?string $created_at = null; // populated by DB default
 }
-
