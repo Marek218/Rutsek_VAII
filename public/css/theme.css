@@ -197,3 +197,94 @@ textarea:focus,
 #nextAvailableStatus { color: var(--lux-muted); }
 :root[data-theme="dark"] #availabilityStatus,
 :root[data-theme="dark"] #nextAvailableStatus { color: rgba(238,241,255,0.84); }
+
+/* Offcanvas (hamburger) adjustments for dark mode: ensure the menu matches site dark tokens */
+:root[data-theme="dark"] .offcanvas,
+:root[data-theme="dark"] .offcanvas-header,
+:root[data-theme="dark"] .offcanvas-body {
+    background: var(--lux-nav-bg) !important;
+    color: var(--lux-nav-text) !important;
+    border-color: rgba(255,255,255,0.04);
+}
+:root[data-theme="dark"] .offcanvas .nav-link {
+    color: var(--lux-nav-text) !important;
+}
+:root[data-theme="dark"] .offcanvas .nav-link:hover,
+:root[data-theme="dark"] .offcanvas .nav-link:focus {
+    color: var(--lux-accent-2) !important;
+}
+/* Make the offcanvas close icon visible in dark mode (invert the SVG) */
+:root[data-theme="dark"] .offcanvas .btn-close {
+    filter: invert(1) brightness(1.2);
+}
+
+/* Inputs: ensure in dark mode the text (and caret) are visible even if Bootstrap rules compete */
+:root[data-theme="dark"] .form-control,
+:root[data-theme="dark"] .form-select,
+:root[data-theme="dark"] textarea {
+    background: var(--lux-input-bg) !important;
+    color: var(--lux-input-text) !important;
+    border-color: var(--lux-input-border) !important;
+    caret-color: var(--lux-input-text) !important;
+}
+:root[data-theme="dark"] .form-control::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+    color: rgba(238,241,255,0.55) !important;
+}
+
+/* Ensure inputs on the auth/login form are readable; this targets common auth form structures */
+:root[data-theme="dark"] .card-signin .form-control,
+:root[data-theme="dark"] .card-signin .form-select {
+    background: var(--lux-input-bg) !important;
+    color: var(--lux-input-text) !important;
+}
+
+/* Override specifically for the login card: use darker typed text and caret so user can see input while typing in dark mode */
+:root[data-theme="dark"] .card-signin .form-control,
+:root[data-theme="dark"] .card-signin input.form-control,
+:root[data-theme="dark"] .card-signin input[type="text"],
+:root[data-theme="dark"] .card-signin input[type="password"],
+:root[data-theme="dark"] .card-signin textarea {
+    /* use a darker color for typed text to contrast with potential light input backgrounds */
+    color: #0b1220 !important;
+    -webkit-text-fill-color: #0b1220 !important; /* for Chrome/Brave autofill/text rendering */
+    caret-color: #0b1220 !important;
+    background: #ffffff !important; /* keep input background light for maximum contrast */
+    border-color: rgba(0,0,0,0.12) !important;
+}
+
+:root[data-theme="dark"] .card-signin .form-control::placeholder,
+:root[data-theme="dark"] .card-signin textarea::placeholder {
+    color: rgba(11,18,32,0.35) !important;
+}
+
+/* Chrome/Brave autofill fix: ensure autofilled inputs keep the intended background and text color */
+:root[data-theme="dark"] .card-signin input:-webkit-autofill,
+:root[data-theme="dark"] .card-signin textarea:-webkit-autofill,
+:root[data-theme="dark"] .card-signin select:-webkit-autofill,
+:root[data-theme="dark"] input:-webkit-autofill,
+:root[data-theme="dark"] textarea:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important; /* force white bg like our inputs */
+    box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #0b1220 !important;
+    caret-color: #0b1220 !important;
+}
+
+/* Extra strong selector as fallback: target html[data-theme] as well */
+html[data-theme="dark"] .card-signin input.form-control,
+html[data-theme="dark"] .card-signin input[type="text"],
+html[data-theme="dark"] .card-signin input[type="password"],
+html[data-theme="dark"] .card-signin textarea {
+    color: #0b1220 !important;
+    -webkit-text-fill-color: #0b1220 !important;
+    caret-color: #0b1220 !important;
+    background: #ffffff !important;
+    border-color: rgba(0,0,0,0.12) !important;
+}
+
+/* Also make theme-toggle button clearly visible in offcanvas/dark mode */
+:root[data-theme="dark"] .offcanvas .theme-toggle {
+    background: rgba(255,255,255,0.04);
+    color: var(--lux-nav-text);
+    border-color: rgba(255,255,255,0.06);
+}

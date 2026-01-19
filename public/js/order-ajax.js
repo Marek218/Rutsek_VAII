@@ -3,6 +3,8 @@
 // 1) Availability check (date+time). All services assumed 60 minutes.
 // 2) Submit booking without full page reload
 
+//    Made with AI
+
 (function () {
     'use strict';
 

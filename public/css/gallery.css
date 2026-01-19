@@ -172,5 +172,3 @@
 /* ensure the delete button doesn't block click for lightbox on mobiles: pointer-events only on button */
 .gallery-thumb a { pointer-events: auto; }
 .gallery-admin-delete { pointer-events: auto; }
-
-/* End of edits */

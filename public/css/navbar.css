@@ -40,3 +40,56 @@ a.nav-link:hover, a.nav-link:focus {
     /* ensure toggler hidden on sm+ (we already set classes), keep spacing consistent */
     .navbar-toggler { display: none !important; }
 }
+
+/* Responsive breakpoint override: show hamburger at <=650px, desktop links at >650px
+   This overrides Bootstrap's default sm (576px) behavior for the main navbar only.
+*/
+@media (max-width: 650px) {
+    /* hide desktop nav (left links) */
+    .navbar .navbar-nav.me-auto.d-none.d-sm-flex {
+        display: none !important;
+    }
+    /* ensure hamburger toggler is visible on small screens */
+    .navbar .navbar-toggler.d-block.d-sm-none {
+        display: block !important;
+    }
+
+    /* hide user/login area and theme toggle on small screens */
+    .navbar .navbar-text.d-none.d-sm-inline { display: none !important; }
+    .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: none !important; }
+}
+
+@media (min-width: 651px) {
+    /* show desktop nav on wider screens */
+    .navbar .navbar-nav.me-auto.d-none.d-sm-flex {
+        display: flex !important;
+    }
+    /* hide hamburger on wider screens */
+    .navbar .navbar-toggler.d-block.d-sm-none {
+        display: none !important;
+    }
+
+    /* restore user/login area and theme toggle on wider screens */
+    .navbar .navbar-text.d-none.d-sm-inline { display: inline !important; }
+    .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: flex !important; }
+}
+
+/* When admin (or logged user) is present, use a wider breakpoint: show hamburger at <=835px */
+@media (max-width: 835px) {
+    body.is-logged .navbar .navbar-nav.me-auto.d-none.d-sm-flex { display: none !important; }
+    body.is-logged .navbar .navbar-toggler.d-block.d-sm-none { display: block !important; }
+
+    /* also hide user/login area and theme toggle for logged users when collapsed */
+    body.is-logged .navbar .navbar-text.d-none.d-sm-inline { display: none !important; }
+    body.is-logged .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: none !important; }
+}
+
+/* and ensure on wider screens (>=836px) desktop nav shows */
+@media (min-width: 836px) {
+    body.is-logged .navbar .navbar-nav.me-auto.d-none.d-sm-flex { display: flex !important; }
+    body.is-logged .navbar .navbar-toggler.d-block.d-sm-none { display: none !important; }
+
+    /* restore user/login area and theme toggle for logged users on wider screens */
+    body.is-logged .navbar .navbar-text.d-none.d-sm-inline { display: inline !important; }
+    body.is-logged .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: flex !important; }
+}

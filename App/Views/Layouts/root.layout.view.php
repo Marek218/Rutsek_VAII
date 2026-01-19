@@ -42,7 +42,7 @@
 
 
 </head>
-<body>
+<body<?= $user->isLoggedIn() ? ' class="is-logged"' : '' ?>>
 <nav class="navbar navbar-expand-sm bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="<?= $link->url('home.index') ?>">

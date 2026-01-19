@@ -100,35 +100,6 @@ $normalizePathUrl = function (?string $raw) {
 
             <form method="post" action="<?= $link->url('home.gallery') ?>" enctype="multipart/form-data" class="row g-3">
                 <input type="hidden" name="mode" value="upload">
-
-                <div class="col-md-4">
-                    <label class="form-label">Názov (voliteľné)</label>
-                    <label>
-                        <input type="text" name="title" class="form-control" placeholder="napr. Pánsky strih">
-                    </label>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Kategória (voliteľné)</label>
-                    <label>
-                        <input type="text" name="category" class="form-control" placeholder="napr. Pánske">
-                    </label>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Poradie</label>
-                    <label>
-                        <input type="number" name="sort_order" class="form-control" value="0">
-                    </label>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Viditeľnosť</label>
-                    <label>
-                        <select name="is_public" class="form-select">
-                            <option value="1" selected>Verejné</option>
-                            <option value="0">Skryté</option>
-                        </select>
-                    </label>
-                </div>
-
                 <div class="col-12">
                     <label class="form-label">Obrázok (PNG/JPG)</label>
                     <div class="d-flex gap-2 align-items-center flex-wrap">
