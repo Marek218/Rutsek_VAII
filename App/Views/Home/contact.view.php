@@ -18,7 +18,7 @@ $ciMap = $contactInfo?->map_embed_url ?? 'https://www.google.com/maps?q=Besky%CC
 $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:00\nSobota: 08:00 – 13:00\nNedeľa: Zatvorené";
 ?>
 <!-- Wider centered wrapper: increases max width on large screens without touching footer or layout -->
-<div style="max-width:1200px; width:100%; margin:0 auto; padding:0 12px;">
+<div>
 
     <div class="row">
         <div class="col-12 text-center mb-4">
@@ -44,12 +44,11 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
 
     <!-- Top row: left = info card, right = map -->
     <div class="contact-grid">
-
         <div class="contact-left">
             <div class="card shadow-sm" style="border-radius:12px;">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
-                        <img src="<?= $link->asset($ciLogo) ?>" alt="Luxer logo" style="width:96px;height:auto;margin-right:14px;border-radius:8px;">
+                        <img src="<?= $link->asset($ciLogo) ?>" alt="Luxer logo">
                         <div>
                             <h4 class="mb-0"><?= htmlspecialchars($ciSalon) ?></h4>
                             <div class="text-muted"><?= htmlspecialchars($ciPerson) ?></div>
@@ -58,18 +57,18 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
 
                     <div class="mb-3">
                         <a href="tel:<?= htmlspecialchars(preg_replace('~[^0-9+]~', '', $ciPhone)) ?>" class="d-inline-flex align-items-center text-decoration-none contact-phone">
-                            <span aria-hidden="true" style="font-size:1.05rem;margin-right:.5rem">📞</span>
+                            <span aria-hidden="true" >📞</span>
                             <span class="fs-5 fw-semibold"><?= htmlspecialchars($ciPhone) ?></span>
                         </a>
                     </div>
 
                     <ul class="list-unstyled mb-3 contact-meta">
                         <li class="mb-1">
-                            <span aria-hidden="true" style="margin-right:.5rem">📍</span>
+                            <span aria-hidden="true">📍</span>
                             <?= htmlspecialchars($ciAddress) ?>
                         </li>
                         <li class="mb-1">
-                            <span aria-hidden="true" style="margin-right:.5rem">✉️</span>
+                            <span aria-hidden="true">✉️</span>
                             <a href="mailto:<?= htmlspecialchars($ciEmail) ?>"><?= htmlspecialchars($ciEmail) ?></a>
                         </li>
                     </ul>
@@ -83,18 +82,16 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
         </div>
 
         <div class="contact-right">
-            <div class="card shadow-sm" style="border-radius:12px;height:100%;overflow:hidden;">
+            <div class="card shadow-sm">
                 <iframe
                     src="<?= htmlspecialchars($ciMap) ?>"
                     width="100%" height="100%" style="min-height:480px;border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
-
     </div>
 
-    <!-- Full-width form card below -->
     <div class="contact-form-card">
-        <div class="card shadow-sm" style="border-radius:12px;padding:1rem;">
+        <div class="card shadow-sm">
             <div class="card-body">
                 <h5 class="mb-3">Napíšte nám</h5>
 
@@ -105,9 +102,8 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                 <?php } ?>
 
                 <form method="post" action="<?= $link->url('message.store') ?>" class="contact-form" data-ajax-contact="1">
-                    <!-- Honeypot anti-spam: musí zostať prázdne -->
                     <label>
-                        <input type="text" name="website" value="" style="position:absolute;left:-9999px;top:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
+                        <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
                     </label>
 
                     <div class="row g-2">
@@ -134,6 +130,11 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                             <textarea id="contact-message" name="message" class="form-control<?= !empty($errors['message']) ? ' is-invalid' : '' ?>" rows="4" required><?= htmlspecialchars((string)($old['message'] ?? '')) ?></textarea>
                             <?php if (!empty($errors['message'])) { ?><div class="invalid-feedback"><?= htmlspecialchars($errors['message']) ?></div><?php } ?>
                         </div>
+                    </div>
+
+                    <!-- Submit button -->
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary" aria-label="Odoslať správu">Odoslať</button>
                     </div>
                 </form>
             </div>

@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Models\Gallery;
-use App\Support\FileUpload;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
 use Framework\Http\Responses\JsonResponse;
@@ -49,23 +48,12 @@ class GalleryController extends BaseController
 
             try {
                 if ($mode === 'upload') {
+                    // delegate upload handling (validation, storing, DB insert) to model
                     $file = $request->file('image');
-                    $result = FileUpload::storeGalleryFile($file, 'gallery');
+                    $result = Gallery::handleUpload($file);
                     if (!$result['ok']) {
-                        $err = $result['error'] ?? 'uploaderror';
-                        return $this->redirect($this->url('gallery.admin', ['flash' => 'badfile', 'err' => $err]));
+                        return $this->redirect($this->url('gallery.admin', ['flash' => 'badfile', 'err' => $result['error']]));
                     }
-
-                    $g = new Gallery();
-                    $g->path_url = $result['path'];
-                    $g->title = null;
-                    $g->is_public = 1;
-                    // determine next sort order
-                    $items = Gallery::getAll(orderBy: '`sort_order` DESC', limit: 1);
-                    $max = 0;
-                    if (!empty($items)) { $max = (int)($items[0]->sort_order ?? 0); }
-                    $g->sort_order = $max + 1;
-                    $g->save();
 
                     return $this->redirect($this->url('gallery.admin', ['flash' => 'ok']));
                 }
@@ -73,17 +61,8 @@ class GalleryController extends BaseController
                 if ($mode === 'delete') {
                     $id = (int)($request->value('id') ?? 0);
                     if ($id > 0) {
-                        $item = Gallery::getOne($id);
-                        if ($item) {
-                            // try to unlink file (normalize path)
-                            $path = Gallery::normalizePathUrl($item->path_url ?? null);
-                            $publicDir = realpath(__DIR__ . '/../../public');
-                            if ($path && $publicDir) {
-                                $full = rtrim($publicDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
-                                if (is_file($full)) { @unlink($full); }
-                            }
-                            $item->delete();
-                        }
+                        // model decides if delete is allowed and removes file + DB row
+                        Gallery::deleteById($id);
                     }
                     if ($request->isAjax()) { return new JsonResponse(['ok' => true, 'id' => $id]); }
                     return $this->redirect($this->url('gallery.admin', ['flash' => 'deleted']));
@@ -94,12 +73,8 @@ class GalleryController extends BaseController
                     $post = $request->post() ?: [];
                     $order = $post['order'] ?? $post['order[]'] ?? [];
                     if (!is_array($order)) { $order = [$order]; }
-                    $pos = 1;
-                    foreach ($order as $id) {
-                        $id = (int)$id;
-                        $g = Gallery::getOne($id);
-                        if ($g) { $g->sort_order = $pos++; $g->save(); }
-                    }
+                    // model handles transactional reorder
+                    Gallery::reorder($order);
                     if ($request->isAjax()) { return new JsonResponse(['ok' => true]); }
                     return $this->redirect($this->url('gallery.admin', ['flash' => 'ok']));
                 }

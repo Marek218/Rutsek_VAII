@@ -163,12 +163,22 @@
 }
 
 /* ensure placeholder has reasonable min-height on small screens */
-#galleryGrid[data-admin-reorder="1"] .gallery-placeholder { min-height: 140px; }
+#galleryGrid[data-admin-reorder="1"] .gallery-placeholder {
+    min-height: 140px;
+}
 
 /* When admin reorder is active, disable anchor pointer-events so dragging is possible on the thumbnail; keep delete button clickable */
-#galleryGrid.admin-reorder-active .gallery-thumb a { pointer-events: none; }
-#galleryGrid.admin-reorder-active .gallery-admin-delete { pointer-events: auto; }
+#galleryGrid.admin-reorder-active .gallery-thumb a {
+    pointer-events: none;
+}
+#galleryGrid.admin-reorder-active .gallery-admin-delete {
+    pointer-events: auto;
+}
 
 /* ensure the delete button doesn't block click for lightbox on mobiles: pointer-events only on button */
-.gallery-thumb a { pointer-events: auto; }
-.gallery-admin-delete { pointer-events: auto; }
+.gallery-thumb a {
+    pointer-events: auto;
+}
+.gallery-admin-delete {
+    pointer-events: auto;
+}

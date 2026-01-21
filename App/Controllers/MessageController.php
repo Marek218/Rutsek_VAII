@@ -36,23 +36,22 @@ class MessageController extends BaseController
             'user_agent' => (string)($request->server('HTTP_USER_AGENT') ?? ''),
         ];
 
-        $errors = [];
-        if ($data['website'] !== '') { // honeypot
-            $errors['form'] = 'Invalid submission';
-        }
-        if ($data['name'] === '') { $errors['name'] = 'Meno je povinné'; }
-        if ($data['email'] === '' || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) { $errors['email'] = 'Zadajte platný email'; }
-        if (strlen($data['message']) < 5) { $errors['message'] = 'Správa musí mať aspoň 5 znakov'; }
-
-        if (!empty($errors)) {
-            if ($request->isAjax()) {
-                return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
+        try {
+            $id = ContactMessage::createFromArray($data);
+        } catch (\Throwable $e) {
+            $msg = $e->getMessage();
+            $decoded = json_decode($msg, true);
+            if (is_array($decoded)) {
+                if ($request->isAjax()) {
+                    return new JsonResponse(['ok' => false, 'errors' => $decoded], 422);
+                }
+                return $this->html(['errors' => $decoded, 'old' => $data]);
             }
-            // show back on contact page with errors
-            return $this->html(['errors' => $errors, 'old' => $data]);
+            if ($request->isAjax()) {
+                return new JsonResponse(['ok' => false, 'error' => $msg], 500);
+            }
+            return $this->html(['error' => $msg, 'old' => $data]);
         }
-
-        $id = ContactMessage::create($data);
 
         if ($request->isAjax()) {
             return new JsonResponse(['ok' => true, 'id' => $id]);

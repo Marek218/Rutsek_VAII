@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Framework\Core\Model;
 use App\Configuration;
+use App\Support\FileUpload;
+use Framework\DB\Connection;
+use PDO;
 
 /**
  * Gallery image model representing the `gallery` table.
@@ -92,5 +95,116 @@ class Gallery extends Model
         }
         $lines = @file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
         return array_slice($lines, -$maxLines);
+    }
+
+    /**
+     * Handle upload: store file via FileUpload and insert DB record using prepared statements.
+     * Returns ['ok'=>bool,'id'=>int|null,'error'=>string|null,'path'=>string|null]
+     */
+    public static function handleUpload($uploadedFile): array
+    {
+        $result = FileUpload::storeGalleryFile($uploadedFile, 'gallery');
+        if (!$result['ok']) {
+            return ['ok' => false, 'error' => ($result['error'] ?? 'uploadfailed')];
+        }
+
+        $path = $result['path'];
+
+        // Determine next sort order (use aggregate query)
+        $conn = Connection::getInstance();
+        try {
+            $stmt = $conn->prepare('SELECT COALESCE(MAX(`sort_order`), 0) AS mx FROM `gallery`');
+            $stmt->execute([]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $max = isset($row['mx']) ? (int)$row['mx'] : 0;
+
+            $ins = $conn->prepare('INSERT INTO `gallery` (`path_url`, `title`, `is_public`, `sort_order`, `created_at`) VALUES (:path, :title, :is_public, :sort_order, :created_at)');
+            $now = date('Y-m-d H:i:s');
+            $ins->execute([
+                'path' => $path,
+                'title' => null,
+                'is_public' => 1,
+                'sort_order' => $max + 1,
+                'created_at' => $now
+            ]);
+
+            $lastId = $conn->lastInsertId();
+            return ['ok' => true, 'id' => (int)$lastId, 'path' => $path];
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Check if gallery item can be deleted (business rule). Placeholder for checks.
+     */
+    public static function canBeDeleted(int $id): bool
+    {
+        // No complex business rules for gallery items now; return true.
+        return true;
+    }
+
+    /**
+     * Delete gallery item by id: performs DB delete via prepared statement and unlinks file if inside public dir.
+     */
+    public static function deleteById(int $id): void
+    {
+        if ($id <= 0) return;
+        if (!self::canBeDeleted($id)) {
+            throw new \Exception('Gallery item cannot be deleted due to business rules.');
+        }
+
+        $conn = Connection::getInstance();
+        try {
+            // fetch path first
+            $sel = $conn->prepare('SELECT `path_url` FROM `gallery` WHERE `id` = :id');
+            $sel->execute(['id' => $id]);
+            $row = $sel->fetch(PDO::FETCH_ASSOC);
+            $path = $row['path_url'] ?? null;
+
+            // delete DB row
+            $del = $conn->prepare('DELETE FROM `gallery` WHERE `id` = :id');
+            $del->execute(['id' => $id]);
+
+            // unlink file if inside public
+            if ($path) {
+                $norm = self::normalizePathUrl($path);
+                $publicDir = realpath(__DIR__ . '/../../public');
+                if ($norm && $publicDir) {
+                    $full = rtrim($publicDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $norm);
+                    $fullReal = realpath($full);
+                    if ($fullReal && strpos($fullReal, $publicDir) === 0 && is_file($fullReal)) {
+                        @unlink($fullReal);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Reorder gallery items by provided array of ids (first receives sort_order 1). Runs in transaction.
+     */
+    public static function reorder(array $ids): void
+    {
+        if (empty($ids)) return;
+        $conn = Connection::getInstance();
+        $pdo = $conn->getPdo();
+        $pdo->beginTransaction();
+        try {
+            $stmt = $conn->prepare('UPDATE `gallery` SET `sort_order` = :pos WHERE `id` = :id');
+            $pos = 1;
+            foreach ($ids as $id) {
+                $id = (int)$id;
+                if ($id <= 0) continue;
+                $stmt->execute(['pos' => $pos, 'id' => $id]);
+                $pos++;
+            }
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            try { $pdo->rollBack(); } catch (\Throwable $_) {}
+            throw $e;
+        }
     }
 }

@@ -38,27 +38,20 @@ class HomeBoxController extends BaseController
 
         $titles = $request->value('title') ?? [];
         $descs = $request->value('description') ?? [];
-
         if (!is_array($titles)) { $titles = []; }
         if (!is_array($descs)) { $descs = []; }
 
+        // prepare items in expected format for model
+        $items = [];
+        foreach ($titles as $id => $t) {
+            $items[(int)$id] = [
+                'title' => trim((string)$t),
+                'description' => trim((string)($descs[$id] ?? '')),
+            ];
+        }
+
         try {
-            foreach ($titles as $id => $t) {
-                $id = (int)$id;
-                $title = trim((string)$t);
-                $desc = trim((string)($descs[$id] ?? ''));
-
-                if ($id <= 0) { continue; }
-                if ($title === '' || mb_strlen($title) < 2) { continue; }
-                if ($desc === '' || mb_strlen($desc) < 2) { continue; }
-
-                $box = HomeBox::getOne($id);
-                if (!$box) { continue; }
-                $box->title = $title;
-                $box->description = $desc;
-                $box->save();
-            }
-
+            HomeBox::updateMany($items);
             return $this->redirect($this->url('admin.homeBoxes', ['flash' => 'ok']));
         } catch (\Throwable $e) {
             $errors['form'] = 'Uloženie zlyhalo. Skúste to prosím znova.';

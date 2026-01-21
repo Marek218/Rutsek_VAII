@@ -35,7 +35,6 @@ $flash = $flash ?? '';
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="mb-0"><?= htmlspecialchars((string)$b->box_key) ?></h5>
-                            <span class="text-muted small">Poradie: <?= (int)$b->sort_order ?></span>
                         </div>
 
                         <div class="row g-2">

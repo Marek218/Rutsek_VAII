@@ -31,41 +31,6 @@ class OrderController extends BaseController
     }
 
     /**
-     * Returns true if requested slot [start, start+duration) overlaps any existing reservation on the same date.
-     */
-    private function hasOverlap(string $date, string $startTime, int $durationMinutes = 60): bool
-    {
-        // Normalize to HH:MM:SS
-        $startTime = preg_match('/^\d{2}:\d{2}:\d{2}$/', $startTime) ? $startTime : ($startTime . ':00');
-
-        $startTs = strtotime($date . ' ' . $startTime);
-        if ($startTs === false) return true;
-        $endTs = $startTs + ($durationMinutes * 60);
-
-        try {
-            $orders = Order::getAll('`date` = ?', [$date]);
-        } catch (\Throwable $e) {
-            // On DB error, treat as overlapping to be safe
-            return true;
-        }
-
-        foreach ($orders as $o) {
-            $t = (string)($o->time ?? '');
-            if ($t === '') continue;
-            $existingStart = strtotime($date . ' ' . $t);
-            if ($existingStart === false) continue;
-            $existingEnd = $existingStart + ($durationMinutes * 60);
-
-            // overlap if intervals intersect
-            if ($startTs < $existingEnd && $endTs > $existingStart) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * AJAX: checks whether given slot (date+time) is available.
      * All services are treated as 60-minute blocks.
      * GET /order/availability?date=YYYY-MM-DD&time=HH:MM
@@ -96,7 +61,7 @@ class OrderController extends BaseController
         $timeDb = $time . ':00';
 
         try {
-            $available = !$this->hasOverlap($date, $timeDb, 60);
+            $available = !Order::hasOverlap($date, $timeDb, 60);
         } catch (\Throwable $e) {
             return new JsonResponse(['ok' => false, 'available' => false, 'error' => 'Chyba pri overovaní dostupnosti.'], 500);
         }
@@ -162,43 +127,36 @@ class OrderController extends BaseController
 
         $timeDb = $time . ':00';
 
+        // Delegate creation and overlap checking to model
         try {
-            if ($this->hasOverlap($date, $timeDb, 60)) {
-                $errors['time'] = 'Tento termín je už obsadený. Vyberte iný.';
+            $payload = [
+                'first_name' => $first,
+                'last_name' => $last,
+                'email' => $email,
+                'phone' => $phone,
+                'service_id' => $serviceId,
+                'date' => $date,
+                'time' => $time,
+                'notes' => $notes,
+            ];
+            $order = Order::createFromArray($payload);
+        } catch (\Throwable $e) {
+            $msg = $e->getMessage();
+            $decoded = json_decode($msg, true);
+            if (is_array($decoded)) {
+                // business validation errors
                 if ($request->isAjax()) {
-                    return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
+                    return new JsonResponse(['ok' => false, 'errors' => $decoded], 422);
                 }
                 $services = Service::getAll(orderBy: '`name` ASC');
-                return $this->html(['errors' => $errors, 'old' => $request->post(), 'services' => $services], 'Home/order');
+                return $this->html(['errors' => $decoded, 'old' => $request->post(), 'services' => $services], 'Home/order');
             }
-        } catch (\Throwable $e) {
+
             if ($request->isAjax()) {
-                return new JsonResponse(['ok' => false, 'error' => 'Chyba pri overovaní dostupnosti: ' . $e->getMessage()], 500);
+                return new JsonResponse(['ok' => false, 'error' => 'Chyba pri uložení: ' . $msg], 500);
             }
             $services = Service::getAll(orderBy: '`name` ASC');
-            return $this->html(['error' => 'Chyba pri overovaní dostupnosti.', 'old' => $request->post(), 'services' => $services], 'Home/order');
-        }
-
-        $order = new Order();
-        $order->first_name = $first;
-        $order->last_name = $last;
-        $order->email = $email;
-        $order->phone = $phone;
-        $order->service_id = $serviceId;
-        // keep legacy `service` column filled with human readable name for old views
-        $order->service = (string)($service->name ?? '');
-        $order->date = $date;
-        $order->time = $timeDb;
-        $order->notes = $notes ?: null;
-
-        try {
-            $order->save();
-        } catch (\Exception $e) {
-            if ($request->isAjax()) {
-                return new JsonResponse(['ok' => false, 'error' => $e->getMessage()], 500);
-            }
-            $services = Service::getAll(orderBy: '`name` ASC');
-            return $this->html(['error' => $e->getMessage(), 'old' => $request->post(), 'services' => $services], 'Home/order');
+            return $this->html(['error' => $msg, 'old' => $request->post(), 'services' => $services], 'Home/order');
         }
 
         if ($request->isAjax()) {
@@ -239,7 +197,7 @@ class OrderController extends BaseController
             for ($i = 0; $i < $limitSteps; $i++) {
                 $d = date('Y-m-d', $ts);
                 $t = date('H:i:s', $ts);
-                if (!$this->hasOverlap($d, $t, 60)) {
+                if (!Order::hasOverlap($d, $t, 60)) {
                     return new JsonResponse([
                         'ok' => true,
                         'date' => $d,

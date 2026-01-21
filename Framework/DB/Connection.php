@@ -53,7 +53,9 @@ class Connection
                     Configuration::DB_PASS
                 );
                 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+                // For security, disable emulated prepares so PDO uses native prepared statements when available.
+                // This helps prevent accidental query interpolation and increases protection against SQL injection.
+                $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
                 self::$instance = new self($db);
             }
             return self::$instance;

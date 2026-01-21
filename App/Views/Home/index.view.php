@@ -71,14 +71,14 @@ $getBox = function (string $key) use ($boxesByKey, $defaults) {
 
             <?php $b = $getBox('panske'); ?>
             <div class="box">
-                <img class="service-icon" src="<?= $link->asset('images/woman-hair.png') ?>" alt="Pánske strihy ikona">
+                <img class="service-icon" src="<?= $link->asset('images/man-hair.png') ?>" alt="Pánske strihy ikona">
                 <h3><?= htmlspecialchars($b['title']) ?></h3>
                 <p class="service-desc"><?= htmlspecialchars($b['description']) ?></p>
             </div>
 
             <?php $b = $getBox('farbenie'); ?>
             <div class="box">
-                <img class="service-icon" src="<?= $link->asset('images/woman-hair.png') ?>" alt="Farbenie ikona">
+                <img class="service-icon" src="<?= $link->asset('images/hair-dye.png') ?>" alt="Farbenie ikona">
                 <h3><?= htmlspecialchars($b['title']) ?></h3>
                 <p class="service-desc"><?= htmlspecialchars($b['description']) ?></p>
             </div>
@@ -87,21 +87,21 @@ $getBox = function (string $key) use ($boxesByKey, $defaults) {
         <div class="row boxes-row">
             <?php $b = $getBox('trvala'); ?>
             <div class="box">
-                <img class="service-icon" src="<?= $link->asset('images/woman-hair.png') ?>" alt="Trvalá ikona">
+                <img class="service-icon" src="<?= $link->asset('images/long.png') ?>" alt="Trvalá ikona">
                 <h3><?= htmlspecialchars($b['title']) ?></h3>
                 <p class="service-desc"><?= htmlspecialchars($b['description']) ?></p>
             </div>
 
             <?php $b = $getBox('melir'); ?>
             <div class="box">
-                <img class="service-icon" src="<?= $link->asset('images/woman-hair.png') ?>" alt="Melír ikona">
+                <img class="service-icon" src="<?= $link->asset('images/shampoo.png') ?>" alt="Melír ikona">
                 <h3><?= htmlspecialchars($b['title']) ?></h3>
                 <p class="service-desc"><?= htmlspecialchars($b['description']) ?></p>
             </div>
 
             <?php $b = $getBox('ucesy'); ?>
             <div class="box">
-                <img class="service-icon" src="<?= $link->asset('images/woman-hair.png') ?>" alt="Účesy na príležitosť ikona">
+                <img class="service-icon" src="<?= $link->asset('images/hair.png') ?>" alt="Účesy na príležitosť ikona">
                 <h3><?= htmlspecialchars($b['title']) ?></h3>
                 <p class="service-desc"><?= htmlspecialchars($b['description']) ?></p>
             </div>

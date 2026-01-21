@@ -14,7 +14,6 @@ $messages = $messages ?? [];
             <p class="text-muted mb-0">Prehľad odoslaných správ z kontaktnej stránky.</p>
         </div>
         <div class="col-auto align-self-end">
-            <a class="btn btn-outline-secondary" href="<?= $link->url('admin.index') ?>">← Späť</a>
         </div>
     </div>
 

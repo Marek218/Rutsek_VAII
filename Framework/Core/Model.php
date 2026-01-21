@@ -118,6 +118,18 @@ abstract class Model implements \JsonSerializable
         try {
             $sql = "SELECT " . static::getDBColumnNamesList() . " FROM `" . static::getTableName() . "`";
             if ($whereClause != null) {
+                // Defensive protection: do not allow literal single or double quotes inside whereClause
+                // This helps catch accidental SQL built by concatenating user input into the clause.
+                if (preg_match('/["\']/', $whereClause)) {
+                    throw new \Exception('Unsafe WHERE clause detected: please use parameter placeholders (?) or named parameters and pass values via $whereParams to avoid SQL injection.');
+                }
+                // If the clause contains ? placeholders, ensure the caller provided matching number of params
+                if (strpos($whereClause, '?') !== false) {
+                    $expected = substr_count($whereClause, '?');
+                    if ($expected !== count($whereParams)) {
+                        throw new \Exception(sprintf('Placeholder count mismatch in WHERE clause: expected %d parameters, got %d.', $expected, count($whereParams)));
+                    }
+                }
                 $sql .= " WHERE $whereClause";
             }
             if ($orderBy !== null) {
@@ -286,6 +298,10 @@ abstract class Model implements \JsonSerializable
     public static function executeRawSQL(string $sql, array $bindParams = []): array
     {
         try {
+            // Safety: discourage running raw SQL containing literal quoted values without bindings
+            if (preg_match('/WHERE\s+[^;]+["\']/', strtoupper($sql)) && empty($bindParams)) {
+                throw new \Exception('executeRawSQL: running SQL with literal quoted values without bind parameters is disallowed for safety. Use placeholders and pass $bindParams.');
+            }
             $stmt = Connection::getInstance()->prepare($sql);
             $stmt->execute($bindParams);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

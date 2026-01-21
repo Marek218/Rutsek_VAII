@@ -93,32 +93,8 @@ class HomeController extends BaseController
 
     public function services(Request $request): Response
     {
-        // If admin posts changes, process them here
-        if ($request->isPost()) {
-            if (!$this->user->isLoggedIn()) {
-                return $this->redirect($this->url('home.services'));
-            }
-            $prices = $request->value('price') ?? [];
-            if (!is_array($prices)) { $prices = []; }
-
-            foreach ($prices as $id => $val) {
-                $id = (int)$id;
-                $price = trim((string)$val);
-                // normalize decimal (allow comma)
-                $price = str_replace(',', '.', $price);
-                if (!preg_match('/^\d+(?:\.\d{1,2})?$/', $price)) { continue; }
-                $svc = Service::getOne($id);
-                if ($svc) {
-                    $svc->price = $price;
-                    $svc->save();
-                }
-            }
-            // redirect back to services without query params
-            return $this->redirect($this->url('home.services'));
-        }
-
-        $services = Service::getAll(orderBy: '`id` ASC');
-        return $this->html(compact('services'));
+        // redirect to the service controller's index action
+        return $this->redirect($this->url('service.index'));
     }
 
     public function gallery(Request $request): Response

@@ -146,7 +146,7 @@ $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
 <?php } ?>
 
 <!-- Modal (lightbox) -->
-<div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true" aria-labelledby="galleryModalTitle" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content" style="background:transparent;border:0;box-shadow:none;">
             <div class="modal-body p-0 position-relative" style="background:transparent;">
@@ -165,10 +165,18 @@ $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
                         style="max-width:min(100%,1100px);max-height:85vh;width:auto;height:auto;object-fit:contain;display:block;border-radius:10px;box-shadow:0 16px 50px rgba(0,0,0,.35);background:transparent;"
                     >
                 </div>
+
+                <!-- Caption / title for the modal image -->
+                <div class="text-center mt-2">
+                    <div id="galleryModalTitle" class="small text-muted"></div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Gallery modal script (lightweight handler to populate image/caption) -->
+<script src="<?= $link->asset('js/gallery-modal.js') ?>" defer></script>
 
 <?php if ($isAdmin && $debug) {
     $last = Gallery::getUploadLogLines();

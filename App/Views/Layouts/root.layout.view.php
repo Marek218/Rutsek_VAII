@@ -39,8 +39,6 @@
     <script src="<?= $link->asset('js/admin-messages.js') ?>" defer></script>
     <script src="<?= $link->asset('js/contact-ajax.js') ?>" defer></script>
 
-
-
 </head>
 <body<?= $user->isLoggedIn() ? ' class="is-logged"' : '' ?>>
 <nav class="navbar navbar-expand-sm bg-light">
