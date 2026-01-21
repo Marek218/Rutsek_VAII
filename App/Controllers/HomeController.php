@@ -82,7 +82,6 @@ class HomeController extends BaseController
         $old = [];
 
         // Contact form POSTs are handled in MessageController::store
-
         return $this->html(compact('contactInfo', 'flash', 'errors', 'old'));
     }
 

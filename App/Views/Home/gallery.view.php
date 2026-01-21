@@ -133,19 +133,11 @@ $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
                     <?php } ?>
                 </div>
 
-                <!-- caption removed on purpose (user requested no text under images) -->
-
-                <?php if ($isAdmin) { ?>
-                    <div class="p-2">
-                        <div class="small text-muted">#<?= (int)($item->id ?? 0) ?> • <?= htmlspecialchars((string)($item->path_url ?? '')) ?></div>
-                    </div>
-                <?php } ?>
             </div>
         <?php } ?>
     </div>
 <?php } ?>
 
-<!-- Modal (lightbox) -->
 <div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true" aria-labelledby="galleryModalTitle" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content" style="background:transparent;border:0;box-shadow:none;">
@@ -162,13 +154,7 @@ $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
                         src=""
                         alt=""
                         id="galleryModalImage"
-                        style="max-width:min(100%,1100px);max-height:85vh;width:auto;height:auto;object-fit:contain;display:block;border-radius:10px;box-shadow:0 16px 50px rgba(0,0,0,.35);background:transparent;"
                     >
-                </div>
-
-                <!-- Caption / title for the modal image -->
-                <div class="text-center mt-2">
-                    <div id="galleryModalTitle" class="small text-muted"></div>
                 </div>
             </div>
         </div>
@@ -177,14 +163,3 @@ $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
 
 <!-- Gallery modal script (lightweight handler to populate image/caption) -->
 <script src="<?= $link->asset('js/gallery-modal.js') ?>" defer></script>
-
-<?php if ($isAdmin && $debug) {
-    $last = Gallery::getUploadLogLines();
-    if (!empty($last)) {
-        echo '<div class="alert alert-secondary"><strong>Debug – posledné záznamy upload_errors.log:</strong><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;padding:0.5rem;margin-top:.5rem;">' . htmlspecialchars(implode("\n", $last)) . '</pre></div>';
-    } else {
-        echo '<div class="alert alert-secondary"><strong>Debug:</strong> upload_errors.log nenájdený (uistite sa, že adresár var/log existuje a má zápis).</div>';
-    }
-    echo '<div class="small text-muted">Tip: Ak nahrávanie zlyhá, skontrolujte nastavenia PHP <code>upload_max_filesize</code> a <code>post_max_size</code> a práva adresára <code>public/uploads/gallery</code>. Max veľkosť uploadu nastavená v aplikácii: 5 MB.</div>';
-}
-?>

@@ -230,12 +230,15 @@ abstract class Model implements \JsonSerializable
             }
             // Insert new record
             if ($this->_dbId === null) {
-                $arrColumns = array_map(fn($item) => (':' . $item), array_keys($data));
-                $columns = '`' . implode('`,`', array_keys($data)) . "`";
+                // IMPORTANT: do not insert columns with explicit NULL values — allow DB defaults to apply.
+                $insertData = array_filter($data, fn($v) => $v !== null);
+
+                $arrColumns = array_map(fn($item) => (':' . $item), array_keys($insertData));
+                $columns = '`' . implode('`,`', array_keys($insertData)) . "`";
                 $params = implode(',', $arrColumns);
                 $sql = "INSERT INTO `" . static::getTableName() . "` ($columns) VALUES ($params)";
                 $stmt = Connection::getInstance()->prepare($sql);
-                $stmt->execute($data);
+                $stmt->execute($insertData);
 
                 $pkPropertyName = static::toPropertyName(static::getPkColumnName());
                 if (!isset($this->{$pkPropertyName})) {
@@ -246,8 +249,7 @@ abstract class Model implements \JsonSerializable
             } else {
                 $arrColumns = array_map(fn($item) => ("`" . $item . '`=:' . $item), array_keys($data));
                 $columns = implode(',', $arrColumns);
-                $sql = "UPDATE `" . static::getTableName() . "` SET $columns WHERE `" . static::getPkColumnName() .
-                    "`=:__pk";
+                $sql = "UPDATE `" . static::getTableName() . "` SET $columns WHERE `" . static::getPkColumnName() . "`=:__pk";
                 $stmt = Connection::getInstance()->prepare($sql);
                 $data["__pk"] = $this->_dbId;
                 $stmt->execute($data);

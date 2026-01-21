@@ -1,22 +1,104 @@
 /* services.css - minimal cleaned */
 
-.boxes-row{display:flex;gap:1.25rem;flex-wrap:wrap;justify-content:center;align-items:stretch;margin-bottom:1.25rem}
-.box{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:220px;max-width:320px;flex:1 1 260px;min-height:220px;padding:1.25rem;border-radius:14px;border:1px solid var(--lux-border);background:rgba(255,255,255,0.82);color:#0b1220;box-shadow:0 10px 28px rgba(0,0,0,0.06);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.box .service-icon{width:64px;height:64px;margin-bottom:.8rem}
-.box h3{margin:.3rem 0 .5rem 0;font-size:1.05rem;color:#c85472}
-.box .service-desc{margin:0;color:rgba(11,18,32,0.68);font-size:.9rem}
-@media (max-width:480px){.box{min-width:100%;max-width:100%;flex-basis:100%}}
+.boxes-row{
+    display:flex;
+    gap:1.25rem;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:stretch;
+    margin-bottom:1.25rem
+}
+.box{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    min-width:220px;
+    max-width:320px;
+    flex:1 1 260px;
+    min-height:220px;
+    padding:1.25rem;
+    border-radius:14px;
+    border:1px solid var(--lux-border);
+    background:rgba(255,255,255,0.82);
+    color:#0b1220;
+    box-shadow:0 10px 28px rgba(0,0,0,0.06);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px)
+}
+.box .service-icon{
+    width:64px;
+    height:64px;
+    margin-bottom:.8rem
+}
+.box h3{
+    margin:.3rem 0 .5rem 0;
+    font-size:1.05rem;
+    color:#c85472
+}
+.box .service-desc{
+    margin:0;
+    color:rgba(11,18,32,0.68);
+    font-size:.9rem
+}
+@media (max-width:480px){.box{
+    min-width:100%;
+    max-width:100%;
+    flex-basis:100%}
+}
 
-.services-table{border-radius:14px;overflow:hidden;border:1px solid var(--lux-table-border);background:var(--lux-surface)}
-.services-table thead th{background:var(--lux-table-head-bg);color:var(--lux-table-head-text);border-bottom:1px solid var(--lux-table-border)}
-.services-table tbody td{color:var(--lux-table-text);border-top:1px solid var(--lux-table-border)}
-:root[data-theme="dark"] .services-table{background:rgba(255,255,255,0.04)}
-:root[data-theme="dark"] .services-table tbody tr > *{background:transparent}
+.services-table{
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--lux-table-border);
+    background:var(--lux-surface)
+}
+.services-table thead th{
+    background:var(--lux-table-head-bg);
+    color:var(--lux-table-head-text);
+    border-bottom:1px solid var(--lux-table-border)
+}
+.services-table tbody td{
+    color:var(--lux-table-text);
+    border-top:1px solid var(--lux-table-border)
+}
+:root[data-theme="dark"] .services-table{
+    background:rgba(255,255,255,0.04)
+}
+:root[data-theme="dark"] .services-table tbody tr > *{
+    background:transparent
+}
 
-.services-table input[type="text"]{width:96px;text-align:right;border-radius:10px;padding:.45rem .55rem;border:1px solid var(--lux-input-border);background:var(--lux-input-bg);color:var(--lux-input-text)}
-.services-table input[type="text"]:focus{outline:none;box-shadow:0 0 0 .2rem var(--lux-input-focus)}
-:root[data-theme="dark"] .services-table input[type="text"]{background:rgba(255,255,255,0.92);color:#0b1220;border-color:rgba(255,255,255,0.22)}
-:root[data-theme="dark"] .services-table input[type="text"]:focus{background:rgba(255,255,255,0.96);color:#0b1220;border-color:rgba(96,165,250,0.55)}
+.services-table input[type="text"]{
+    width:96px;
+    text-align:right;
+    border-radius:10px;
+    padding:.45rem .55rem;
+    border:1px solid var(--lux-input-border);
+    background:var(--lux-input-bg);
+    color:var(--lux-input-text)
+}
+.services-table input[type="text"]:focus{
+    outline:none;
+    box-shadow:0 0 0 .2rem var(--lux-input-focus)
+}
+:root[data-theme="dark"] .services-table input[type="text"]{
+    background:rgba(255,255,255,0.92);
+    color:#0b1220;
+    border-color:rgba(255,255,255,0.22)
+}
+:root[data-theme="dark"] .services-table input[type="text"]:focus{
+    background:rgba(255,255,255,0.96);
+    color:#0b1220;
+    border-color:rgba(96,165,250,0.55)
+}
 
-:root[data-theme="dark"] .box{border-color:rgba(255,255,255,0.10);background:rgba(255,255,255,0.86);color:#0b1220;box-shadow:0 18px 50px rgba(0,0,0,0.30)}
-:root[data-theme="dark"] .box .service-desc{color:rgba(11,18,32,0.70)}
+:root[data-theme="dark"] .box{
+    border-color:rgba(255,255,255,0.10);
+    background:rgba(255,255,255,0.86);
+    color:#0b1220;
+    box-shadow:0 18px 50px rgba(0,0,0,0.30)
+}
+:root[data-theme="dark"] .box .service-desc{
+    color:rgba(11,18,32,0.70)
+}

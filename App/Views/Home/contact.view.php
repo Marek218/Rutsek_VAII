@@ -102,10 +102,6 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                 <?php } ?>
 
                 <form method="post" action="<?= $link->url('message.store') ?>" class="contact-form" data-ajax-contact="1">
-                    <label>
-                        <input type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    </label>
-
                     <div class="row g-2">
                         <div class="col-12 col-md-6">
                             <label for="contact-name" class="form-label">Meno</label>

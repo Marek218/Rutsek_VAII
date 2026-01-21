@@ -48,7 +48,6 @@ $services = $services ?? [];
               data-next-available-url="<?= $link->url('order.nextAvailable') ?>"
               data-next-available-url-fallback="/order/nextAvailable">
             <div class="row">
-                <!-- first name / last name -->
                 <div class="col-md-6 mb-3">
                     <label for="first_name">Meno</label>
                     <input id="first_name" name="first_name" type="text" required class="form-control"
@@ -68,7 +67,6 @@ $services = $services ?? [];
             </div>
 
             <div class="row">
-                <!-- contact: email and phone -->
                 <div class="col-md-6 mb-3">
                     <label for="email">Email</label>
                     <input id="email" name="email" type="email" required class="form-control"
@@ -139,4 +137,3 @@ $services = $services ?? [];
         </form>
     </div>
 </div>
-

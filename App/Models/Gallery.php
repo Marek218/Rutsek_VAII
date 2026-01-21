@@ -84,20 +84,6 @@ class Gallery extends Model
     }
 
     /**
-     * Return last N lines of upload log if present, for debug display in admin views.
-     * Returns array of lines or empty array if unavailable.
-     */
-    public static function getUploadLogLines(int $maxLines = 40): array
-    {
-        $logFile = realpath(__DIR__ . '/../../var/log/upload_errors.log');
-        if (!$logFile || !is_file($logFile) || !is_readable($logFile)) {
-            return [];
-        }
-        $lines = @file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-        return array_slice($lines, -$maxLines);
-    }
-
-    /**
      * Handle upload: store file via FileUpload and insert DB record using prepared statements.
      * Returns ['ok'=>bool,'id'=>int|null,'error'=>string|null,'path'=>string|null]
      */

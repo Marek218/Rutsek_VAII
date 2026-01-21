@@ -73,7 +73,7 @@
 
         <!-- User/login area (kept visible on sm+, hidden on xs - offcanvas shows it) -->
         <?php if ($user->isLoggedIn()) { ?>
-            <span class="navbar-text d-none d-sm-inline">Logged in user: <b><?= $user->getName() ?></b></span>
+            <span class="navbar-text d-none d-sm-inline">Prihlásený: <b><?= $user->getName() ?></b></span>
             <ul class="navbar-nav ms-auto d-none d-sm-flex align-items-center">
                 <li class="nav-item me-2">
                     <button type="button" class="theme-toggle" data-theme-toggle aria-label="Prepnúť motív">
@@ -156,9 +156,6 @@
                     srdci Banskej Bystrice
                 </p>
             </div>
-            <!-- Stĺpec 2 (removed quick links) -->
-
-            <!-- Stĺpec 3 (expanded) -->
             <div class="col-md-6 mb-4">
                 <h5 class="fw-bold">Kontakt</h5>
                 <p class="mt-3 mb-1">Námestie Slobody 4<br>Banská Bystrica</p>

@@ -1,4 +1,4 @@
-// Made with AI
+// Na vypracovanie tejto semestralnej prace bola pouzita AI
 # Luxer BB — Inštalácia a spustenie
 
 Tento README obsahuje kroky pre rýchle spustenie projektu lokálne. Predpokladá sa, že pracujete na Windows (PowerShell), ale návod obsahuje aj alternatívu bez Dockeru.
@@ -72,12 +72,3 @@ Admin účet (lokálny test) je definovaný v `Framework/Auth/DummyAuthenticator
 - Heslo: `admin`
 
 Ak chcete zmeniť heslo, upravte `PASSWORD_HASH` alebo implementujte iný `AUTH_CLASS`.
-
----
-
-## Časté príčiny problémov
-- Nemenené DB konštanty v `App/Configuration.php` pri spustení bez Dockeru.
-- Chýbajúce práva zápisu do `public/uploads`.
-- Staré cacheované CSS/JS v prehliadači — skúste Ctrl+F5.
-
----
