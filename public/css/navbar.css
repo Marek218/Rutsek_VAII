@@ -1,95 +1,17 @@
 /* navbar.css - štýly pre hlavnú navigáciu (navbar) a logo */
+.navbar-brand img{max-height:40px;width:auto}
+.navbar{background:linear-gradient(135deg,#fdfdfd 0%,#fdfdfd 100%);box-shadow:0 1px 4px rgba(43,43,43,0.06)}
+a.nav-link{color:#2b2b2b!important;text-decoration:none;border-bottom:2px solid transparent;transition:border-bottom .2s,color .2s}
+a.nav-link:hover,a.nav-link:focus{color:#c85472!important;border-bottom:2px solid #c85472}
 
-.navbar-brand img {
-    max-height: 40px; /* smaller logo */
-    width: auto;
-}
+.navbar-toggler{border:0;background:transparent}
+.navbar-toggler .navbar-toggler-icon{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(43,43,43,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E")}
+.offcanvas-body{padding:1rem 1.25rem}
+.offcanvas-user{margin-top:.5rem}
+@media (min-width:576px){.navbar-toggler{display:none!important}}
 
-.navbar {
-    background: linear-gradient(135deg, #fdfdfd 0%, #fdfdfd 100%);
-    box-shadow: 0 1px 4px rgba(43, 43, 43, 0.06);
-}
+@media (max-width:650px){.navbar .navbar-nav.me-auto.d-none.d-sm-flex{display:none!important}.navbar .navbar-toggler.d-block.d-sm-none{display:block!important}.navbar .navbar-text.d-none.d-sm-inline{display:none!important}.navbar .navbar-nav.ms-auto.d-none.d-sm-flex{display:none!important}}
+@media (min-width:651px){.navbar .navbar-nav.me-auto.d-none.d-sm-flex{display:flex!important}.navbar .navbar-toggler.d-block.d-sm-none{display:none!important}.navbar .navbar-text.d-none.d-sm-inline{display:inline!important}.navbar .navbar-nav.ms-auto.d-none.d-sm-flex{display:flex!important}}
 
-a.nav-link {
-    color: #2b2b2b !important;
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: border-bottom 0.2s, color 0.2s;
-}
-a.nav-link:hover, a.nav-link:focus {
-    color: #c85472 !important;
-    border-bottom: 2px solid #c85472;
-}
-
-/* Offcanvas / mobile tweaks */
-.navbar-toggler {
-    border: 0;
-    background: transparent;
-}
-.navbar-toggler .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(43,43,43,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-}
-
-.offcanvas-body {
-    padding: 1rem 1.25rem;
-}
-
-.offcanvas-user { margin-top: 0.5rem; }
-
-@media (min-width: 576px) {
-    /* ensure toggler hidden on sm+ (we already set classes), keep spacing consistent */
-    .navbar-toggler { display: none !important; }
-}
-
-/* Responsive breakpoint override: show hamburger at <=650px, desktop links at >650px
-   This overrides Bootstrap's default sm (576px) behavior for the main navbar only.
-*/
-@media (max-width: 650px) {
-    /* hide desktop nav (left links) */
-    .navbar .navbar-nav.me-auto.d-none.d-sm-flex {
-        display: none !important;
-    }
-    /* ensure hamburger toggler is visible on small screens */
-    .navbar .navbar-toggler.d-block.d-sm-none {
-        display: block !important;
-    }
-
-    /* hide user/login area and theme toggle on small screens */
-    .navbar .navbar-text.d-none.d-sm-inline { display: none !important; }
-    .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: none !important; }
-}
-
-@media (min-width: 651px) {
-    /* show desktop nav on wider screens */
-    .navbar .navbar-nav.me-auto.d-none.d-sm-flex {
-        display: flex !important;
-    }
-    /* hide hamburger on wider screens */
-    .navbar .navbar-toggler.d-block.d-sm-none {
-        display: none !important;
-    }
-
-    /* restore user/login area and theme toggle on wider screens */
-    .navbar .navbar-text.d-none.d-sm-inline { display: inline !important; }
-    .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: flex !important; }
-}
-
-/* When admin (or logged user) is present, use a wider breakpoint: show hamburger at <=835px */
-@media (max-width: 835px) {
-    body.is-logged .navbar .navbar-nav.me-auto.d-none.d-sm-flex { display: none !important; }
-    body.is-logged .navbar .navbar-toggler.d-block.d-sm-none { display: block !important; }
-
-    /* also hide user/login area and theme toggle for logged users when collapsed */
-    body.is-logged .navbar .navbar-text.d-none.d-sm-inline { display: none !important; }
-    body.is-logged .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: none !important; }
-}
-
-/* and ensure on wider screens (>=836px) desktop nav shows */
-@media (min-width: 836px) {
-    body.is-logged .navbar .navbar-nav.me-auto.d-none.d-sm-flex { display: flex !important; }
-    body.is-logged .navbar .navbar-toggler.d-block.d-sm-none { display: none !important; }
-
-    /* restore user/login area and theme toggle for logged users on wider screens */
-    body.is-logged .navbar .navbar-text.d-none.d-sm-inline { display: inline !important; }
-    body.is-logged .navbar .navbar-nav.ms-auto.d-none.d-sm-flex { display: flex !important; }
-}
+@media (max-width:835px){body.is-logged .navbar .navbar-nav.me-auto.d-none.d-sm-flex{display:none!important}body.is-logged .navbar .navbar-toggler.d-block.d-sm-none{display:block!important}body.is-logged .navbar .navbar-text.d-none.d-sm-inline{display:none!important}body.is-logged .navbar .navbar-nav.ms-auto.d-none.d-sm-flex{display:none!important}}
+@media (min-width:836px){body.is-logged .navbar .navbar-nav.me-auto.d-none.d-sm-flex{display:flex!important}body.is-logged .navbar .navbar-toggler.d-block.d-sm-none{display:none!important}body.is-logged .navbar .navbar-text.d-none.d-sm-inline{display:inline!important}body.is-logged .navbar .navbar-nav.ms-auto.d-none.d-sm-flex{display:flex!important}}

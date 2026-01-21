@@ -1,290 +1,241 @@
-/* theme.css - light/dark theme tokens via CSS variables */
-
-:root {
-    --lux-accent: #ff6b9e;
-    --lux-accent-2: #c85472;
-
-    --lux-bg: linear-gradient(135deg, #ffffff 0%, #fff7e6 100%);
-    --lux-surface: #ffffff;
-    --lux-text: #2b2b2b;
-    --lux-muted: #6b3d4f;
-    --lux-border: rgba(0,0,0,0.08);
-
-    --lux-nav-bg: linear-gradient(135deg, #fdfdfd 0%, #fdfdfd 100%);
-    --lux-nav-text: #2b2b2b;
-    --lux-nav-shadow: 0 1px 4px rgba(43, 43, 43, 0.06);
-
-    --lux-btn-bg: var(--lux-accent);
-    --lux-btn-text: #ffffff;
-
-    --lux-footer-bg: linear-gradient(180deg, #f9e9ec 0%, #f7e6e9 100%);
-    --lux-footer-text: #4a2b2b;
-    --lux-footer-link: #6b3d4f;
-    --lux-footer-link-hover: #c85472;
-
-    --lux-input-bg: #ffffff;
-    --lux-input-text: #2b2b2b;
-    --lux-input-border: rgba(0,0,0,0.10);
-    --lux-input-focus: rgba(255,107,158,0.28);
-
-    --lux-link: #6b3d4f;
-    --lux-link-hover: #c85472;
-    --lux-contact-link: var(--lux-link);
-
-    /* Table tokens (used from utils.css) */
-    --lux-table-text: var(--lux-text);
-    --lux-table-head-text: var(--lux-text);
-    --lux-table-border: var(--lux-border);
-    --lux-table-head-bg: rgba(0,0,0,0.03);
-    --lux-table-row-even: rgba(0,0,0,0.00);
-    --lux-table-row-even-2: rgba(0,0,0,0.015);
-    --lux-table-hover: rgba(0,0,0,0.03);
-
-    color-scheme: light;
+/* theme.css - compacted tokens + rules (conservative cleanup)
+   Preserves all tokens and dark-mode fixes (offcanvas, login input visibility, autofill fixes).
+*/
+:root{
+    --lux-accent:#ff6b9e;
+    --lux-accent-2:#c85472;
+    --lux-bg:linear-gradient(135deg,#ffffff 0%,#fff7e6 100%);
+    --lux-surface:#ffffff;
+    --lux-text:#2b2b2b;
+    --lux-muted:#6b3d4f;
+    --lux-border:rgba(0,0,0,0.08);
+    --lux-nav-bg:linear-gradient(135deg,#fdfdfd 0%,#fdfdfd 100%);
+    --lux-nav-text:#2b2b2b;
+    --lux-nav-shadow:0 1px 4px rgba(43,43,43,0.06);
+    --lux-btn-bg:var(--lux-accent);
+    --lux-btn-text:#ffffff;
+    --lux-footer-bg:linear-gradient(180deg,#f9e9ec 0%,#f7e6e9 100%);
+    --lux-footer-text:#4a2b2b;
+    --lux-footer-link:#6b3d4f;
+    --lux-footer-link-hover:#c85472;
+    --lux-input-bg:#ffffff;
+    --lux-input-text:#2b2b2b;
+    --lux-input-border:rgba(0,0,0,0.10);
+    --lux-input-focus:rgba(255,107,158,0.28);
+    --lux-link:#6b3d4f;
+    --lux-link-hover:#c85472;
+    --lux-contact-link:var(--lux-link);
+    --lux-table-text:var(--lux-text);
+    --lux-table-head-text:var(--lux-text);
+    --lux-table-border:var(--lux-border);
+    --lux-table-head-bg:rgba(0,0,0,0.03);
+    --lux-table-row-even:rgba(0,0,0,0.00);
+    --lux-table-row-even-2:rgba(0,0,0,0.015);
+    --lux-table-hover:rgba(0,0,0,0.03);
+    color-scheme:light
 }
 
-/* Dark theme (matches screenshot vibe: deep navy + violet/blue gradient) */
 :root[data-theme="dark"] {
-    --lux-bg: radial-gradient(1200px 600px at 20% 28%, rgba(96, 165, 250, 0.16) 0%, rgba(0,0,0,0) 58%),
-              radial-gradient(900px 520px at 82% 68%, rgba(168, 85, 247, 0.14) 0%, rgba(0,0,0,0) 62%),
-              linear-gradient(135deg, #3059a5 0%, #674cac 55%, #43265e 100%);
-
-    --lux-surface: rgba(255,255,255,0.06);
-    --lux-text: #eef1ff;
-    --lux-muted: rgba(238,241,255,0.72);
-    --lux-border: rgba(255,255,255,0.10);
-
-    --lux-nav-bg: linear-gradient(135deg, #0b1220 0%, #0e1a2f 55%, #111b33 100%);
-    --lux-nav-text: #eef1ff;
-    --lux-nav-shadow: 0 8px 24px rgba(0,0,0,0.35);
-
-    --lux-btn-bg: #ff86b3;
-    --lux-btn-text: #0b1220;
-
-    --lux-footer-bg: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.04) 100%);
-    --lux-footer-text: rgba(238,241,255,0.84);
-    --lux-footer-link: rgba(238,241,255,0.78);
-    --lux-footer-link-hover: #ff86b3;
-
-    --lux-input-bg: rgba(255,255,255,0.06);
-    --lux-input-text: #eef1ff;
-    --lux-input-border: rgba(255,255,255,0.14);
-    --lux-input-focus: rgba(96,165,250,0.22);
-
-    --lux-link: rgba(238,241,255,0.78);
-    --lux-link-hover: #ff86b3;
-    --lux-contact-link: var(--lux-link);
-
-    /* Table tokens (used from utils.css) */
-    --lux-table-text: rgba(255,255,255,0.94);
-    --lux-table-head-text: rgba(255,255,255,0.96);
-    --lux-table-border: rgba(255,255,255,0.14);
-    --lux-table-head-bg: rgba(0,0,0,0.38);
-    --lux-table-row-even: rgba(255,255,255,0.02);
-    --lux-table-row-even-2: rgba(255,255,255,0.05);
-    --lux-table-hover: rgba(255,255,255,0.06);
-
-    color-scheme: dark;
+    --lux-bg:radial-gradient(1200px 600px at 20% 28%,rgba(96,165,250,0.16) 0%,rgba(0,0,0,0) 58%),
+    radial-gradient(900px 520px at 82% 68%,rgba(168,85,247,0.14) 0%,rgba(0,0,0,0) 62%),linear-gradient(135deg,#3059a5 0%,#674cac 55%,#43265e 100%);--lux-surface:rgba(255,255,255,0.06);--lux-text:#eef1ff;--lux-muted:rgba(238,241,255,0.72);--lux-border:rgba(255,255,255,0.10);--lux-nav-bg:linear-gradient(135deg,#0b1220 0%,#0e1a2f 55%,#111b33 100%);--lux-nav-text:#eef1ff;
+    --lux-nav-shadow:0 8px 24px rgba(0,0,0,0.35);
+    --lux-btn-bg:#ff86b3;
+    --lux-btn-text:#0b1220;
+    --lux-footer-bg:linear-gradient(180deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.04) 100%);
+    --lux-footer-text:rgba(238,241,255,0.84);
+    --lux-footer-link:rgba(238,241,255,0.78);
+    --lux-footer-link-hover:#ff86b3;
+    --lux-input-bg:rgba(255,255,255,0.06);
+    --lux-input-text:#eef1ff;
+    --lux-input-border:rgba(255,255,255,0.14);
+    --lux-input-focus:rgba(96,165,250,0.22);
+    --lux-link:rgba(238,241,255,0.78);
+    --lux-link-hover:#ff86b3;
+    --lux-contact-link:var(--lux-link);
+    --lux-table-text:rgba(255,255,255,0.94);
+    --lux-table-head-text:rgba(255,255,255,0.96);
+    --lux-table-border:rgba(255,255,255,0.14);
+    --lux-table-head-bg:rgba(0,0,0,0.38);
+    --lux-table-row-even:rgba(255,255,255,0.02);
+    --lux-table-row-even-2:rgba(255,255,255,0.05);
+    --lux-table-hover:rgba(255,255,255,0.06);
+    color-scheme:dark
 }
 
-/* Apply tokens */
-html, body {
-    background: var(--lux-bg);
-    color: var(--lux-text);
+html,body{
+    background:var(--lux-bg);
+    color:var(--lux-text)
+}
+.web-content{
+    color:var(--lux-text)
 }
 
-.web-content { color: var(--lux-text); }
-
-/* Navbar */
-.navbar {
-    background: var(--lux-nav-bg) !important;
-    box-shadow: var(--lux-nav-shadow);
+.navbar{
+    background:var(--lux-nav-bg)!important;
+    box-shadow:var(--lux-nav-shadow)
+}
+.navbar .navbar-text{
+    color:var(--lux-nav-text)!important
+}
+a.nav-link{
+    color:var(--lux-nav-text)!important
+}
+a.nav-link:hover,a.nav-link:focus{
+    color:var(--lux-accent-2)!important;
+    border-bottom-color:var(--lux-accent-2)
 }
 
-.navbar .navbar-text { color: var(--lux-nav-text) !important; }
-
-a.nav-link { color: var(--lux-nav-text) !important; }
-
-a.nav-link:hover,
-a.nav-link:focus {
-    color: var(--lux-accent-2) !important;
-    border-bottom-color: var(--lux-accent-2);
+/* hamburger icon colors handled for both themes */
+.navbar-toggler .navbar-toggler-icon{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(238,241,255,0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E")
+}
+:root:not([data-theme="dark"]) .navbar-toggler .navbar-toggler-icon{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(43,43,43,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E")
 }
 
-/* Hamburger icon visible in both themes */
-.navbar-toggler .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(238,241,255,0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+.theme-toggle{
+    border:1px solid var(--lux-border);
+    background:rgba(255,255,255,0.08);
+    color:var(--lux-nav-text);
+    border-radius:999px;
+    padding:.4rem .65rem;
+    display:inline-flex;
+    align-items:center;
+    gap:.45rem;line-height:1
 }
-:root:not([data-theme="dark"]) .navbar-toggler .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(43,43,43,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+:root:not([data-theme="dark"]) .theme-toggle{
+    background:rgba(0,0,0,0.03)
 }
-
-/* Theme toggle button */
-.theme-toggle {
-    border: 1px solid var(--lux-border);
-    background: rgba(255,255,255,0.08);
-    color: var(--lux-nav-text);
-    border-radius: 999px;
-    padding: 0.4rem 0.65rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    line-height: 1;
+.theme-toggle:focus{
+    outline:2px solid rgba(255,107,158,0.45);
+    outline-offset:2px
 }
-:root:not([data-theme="dark"]) .theme-toggle { background: rgba(0,0,0,0.03); }
-.theme-toggle:focus {
-    outline: 2px solid rgba(255,107,158,0.45);
-    outline-offset: 2px;
+.theme-toggle .dot{
+    width:10px;
+    height:10px;
+    border-radius:999px;
+    background:var(--lux-btn-bg);
+    box-shadow:0 0 0 3px rgba(255,107,158,0.16)
 }
-.theme-toggle .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: var(--lux-btn-bg);
-    box-shadow: 0 0 0 3px rgba(255,107,158,0.16);
-}
-.theme-toggle .label { font-size: 0.9rem; font-weight: 600; }
-
-/* Footer */
-.site-footer {
-    background: var(--lux-footer-bg) !important;
-    color: var(--lux-footer-text) !important;
-}
-.site-footer h5,
-.site-footer p,
-.site-footer .footer-copy { color: var(--lux-footer-text) !important; }
-.site-footer .footer-link { color: var(--lux-footer-link) !important; }
-.site-footer .footer-link:hover { color: var(--lux-footer-link-hover) !important; }
-.site-footer .footer-separator { border-top-color: var(--lux-border) !important; }
-
-/* Forms */
-.form-control,
-.form-select,
-textarea,
-.form-check-input {
-    background: var(--lux-input-bg) !important;
-    color: var(--lux-input-text) !important;
-    border-color: var(--lux-input-border) !important;
+.theme-toggle .label{
+    font-size:.9rem;
+    font-weight:600
 }
 
-:root[data-theme="dark"] .form-select { color-scheme: dark; }
-:root[data-theme="dark"] .form-select option,
-:root[data-theme="dark"] .form-select optgroup {
-    background: #0b1220;
-    color: #ffffff;
+.site-footer{
+    background:var(--lux-footer-bg)!important;
+    color:var(--lux-footer-text)!important
+}
+.site-footer h5,.site-footer p,.site-footer .footer-copy{
+    color:var(--lux-footer-text)!important
+}
+.site-footer .footer-link{
+    color:var(--lux-footer-link)!important
+}
+.site-footer .footer-link:hover{
+    color:var(--lux-footer-link-hover)!important
+}
+.site-footer .footer-separator{
+    border-top-color:var(--lux-border)!important
 }
 
-.form-control::placeholder,
-textarea::placeholder { color: rgba(107,61,79,0.55); }
-:root[data-theme="dark"] .form-control::placeholder,
-:root[data-theme="dark"] textarea::placeholder { color: rgba(238,241,255,0.55); }
-
-.form-control:focus,
-.form-select:focus,
-textarea:focus,
-.form-check-input:focus {
-    box-shadow: 0 0 0 0.2rem var(--lux-input-focus) !important;
-    border-color: rgba(255,107,158,0.45) !important;
+/* Forms: inputs/selects/textarea tokens */
+.form-control,.form-select,textarea,.form-check-input{
+    background:var(--lux-input-bg)!important;
+    color:var(--lux-input-text)!important;
+    border-color:var(--lux-input-border)!important
 }
-:root[data-theme="dark"] .form-control:focus,
-:root[data-theme="dark"] .form-select:focus,
-:root[data-theme="dark"] textarea:focus {
-    border-color: rgba(96,165,250,0.55) !important;
+:root[data-theme="dark"] .form-select{
+    color-scheme:dark
+}
+:root[data-theme="dark"] .form-select option,:root[data-theme="dark"] .form-select optgroup{
+    background:#0b1220;color:#ffffff
 }
 
-/* Booking form helper statuses */
-#availabilityStatus,
-#nextAvailableStatus { color: var(--lux-muted); }
-:root[data-theme="dark"] #availabilityStatus,
-:root[data-theme="dark"] #nextAvailableStatus { color: rgba(238,241,255,0.84); }
-
-/* Offcanvas (hamburger) adjustments for dark mode: ensure the menu matches site dark tokens */
-:root[data-theme="dark"] .offcanvas,
-:root[data-theme="dark"] .offcanvas-header,
-:root[data-theme="dark"] .offcanvas-body {
-    background: var(--lux-nav-bg) !important;
-    color: var(--lux-nav-text) !important;
-    border-color: rgba(255,255,255,0.04);
+.form-control::placeholder,textarea::placeholder{
+    color:rgba(107,61,79,0.55)
 }
-:root[data-theme="dark"] .offcanvas .nav-link {
-    color: var(--lux-nav-text) !important;
-}
-:root[data-theme="dark"] .offcanvas .nav-link:hover,
-:root[data-theme="dark"] .offcanvas .nav-link:focus {
-    color: var(--lux-accent-2) !important;
-}
-/* Make the offcanvas close icon visible in dark mode (invert the SVG) */
-:root[data-theme="dark"] .offcanvas .btn-close {
-    filter: invert(1) brightness(1.2);
+:root[data-theme="dark"] .form-control::placeholder,:root[data-theme="dark"] textarea::placeholder{
+    color:rgba(238,241,255,0.55)
 }
 
-/* Inputs: ensure in dark mode the text (and caret) are visible even if Bootstrap rules compete */
-:root[data-theme="dark"] .form-control,
-:root[data-theme="dark"] .form-select,
-:root[data-theme="dark"] textarea {
-    background: var(--lux-input-bg) !important;
-    color: var(--lux-input-text) !important;
-    border-color: var(--lux-input-border) !important;
-    caret-color: var(--lux-input-text) !important;
+.form-control:focus,.form-select:focus,textarea:focus,.form-check-input:focus{
+    box-shadow:0 0 0 .2rem var(--lux-input-focus)!important;
+    border-color:rgba(255,107,158,0.45)!important
 }
-:root[data-theme="dark"] .form-control::placeholder,
-:root[data-theme="dark"] textarea::placeholder {
-    color: rgba(238,241,255,0.55) !important;
+:root[data-theme="dark"] .form-control:focus,:root[data-theme="dark"] .form-select:focus,:root[data-theme="dark"] textarea:focus{
+    border-color:rgba(96,165,250,0.55)!important
 }
 
-/* Ensure inputs on the auth/login form are readable; this targets common auth form structures */
-:root[data-theme="dark"] .card-signin .form-control,
-:root[data-theme="dark"] .card-signin .form-select {
-    background: var(--lux-input-bg) !important;
-    color: var(--lux-input-text) !important;
+#availabilityStatus,#nextAvailableStatus{
+    color:var(--lux-muted)
+}
+:root[data-theme="dark"] #availabilityStatus,:root[data-theme="dark"] #nextAvailableStatus{
+    color:rgba(238,241,255,0.84)
 }
 
-/* Override specifically for the login card: use darker typed text and caret so user can see input while typing in dark mode */
-:root[data-theme="dark"] .card-signin .form-control,
-:root[data-theme="dark"] .card-signin input.form-control,
-:root[data-theme="dark"] .card-signin input[type="text"],
-:root[data-theme="dark"] .card-signin input[type="password"],
-:root[data-theme="dark"] .card-signin textarea {
-    /* use a darker color for typed text to contrast with potential light input backgrounds */
-    color: #0b1220 !important;
-    -webkit-text-fill-color: #0b1220 !important; /* for Chrome/Brave autofill/text rendering */
-    caret-color: #0b1220 !important;
-    background: #ffffff !important; /* keep input background light for maximum contrast */
-    border-color: rgba(0,0,0,0.12) !important;
+/* Offcanvas (hamburger) dark-mode adjustments */
+:root[data-theme="dark"] .offcanvas,:root[data-theme="dark"] .offcanvas-header,:root[data-theme="dark"] .offcanvas-body{
+    background:var(--lux-nav-bg)!important;
+    color:var(--lux-nav-text)!important;
+    border-color:rgba(255,255,255,0.04)
+}
+:root[data-theme="dark"] .offcanvas .nav-link{
+    color:var(--lux-nav-text)!important
+}
+:root[data-theme="dark"] .offcanvas .nav-link:hover,:root[data-theme="dark"] .offcanvas .nav-link:focus{
+    color:var(--lux-accent-2)!important
+}
+:root[data-theme="dark"] .offcanvas .btn-close{
+    filter:invert(1) brightness(1.2)
 }
 
-:root[data-theme="dark"] .card-signin .form-control::placeholder,
-:root[data-theme="dark"] .card-signin textarea::placeholder {
-    color: rgba(11,18,32,0.35) !important;
+/* Inputs: ensure dark-mode inputs are readable (and caret color) */
+:root[data-theme="dark"] .form-control,:root[data-theme="dark"] .form-select,:root[data-theme="dark"] textarea{
+    background:var(--lux-input-bg)!important;
+    color:var(--lux-input-text)!important;
+    border-color:var(--lux-input-border)!important;
+    caret-color:var(--lux-input-text)!important
+}
+:root[data-theme="dark"] .form-control::placeholder,:root[data-theme="dark"] textarea::placeholder{
+    color:rgba(238,241,255,0.55)!important
 }
 
-/* Chrome/Brave autofill fix: ensure autofilled inputs keep the intended background and text color */
-:root[data-theme="dark"] .card-signin input:-webkit-autofill,
-:root[data-theme="dark"] .card-signin textarea:-webkit-autofill,
-:root[data-theme="dark"] .card-signin select:-webkit-autofill,
-:root[data-theme="dark"] input:-webkit-autofill,
-:root[data-theme="dark"] textarea:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important; /* force white bg like our inputs */
-    box-shadow: 0 0 0 1000px #ffffff inset !important;
-    -webkit-text-fill-color: #0b1220 !important;
-    caret-color: #0b1220 !important;
+/* Login/auth card specific overrides for visibility in dark theme */
+:root[data-theme="dark"] .card-signin .form-control,:root[data-theme="dark"] .card-signin .form-select{
+    background:var(--lux-input-bg)!important;
+    color:var(--lux-input-text)!important
+}
+:root[data-theme="dark"] .card-signin .form-control,:root[data-theme="dark"] .card-signin input.form-control,:root[data-theme="dark"] .card-signin input[type="text"],:root[data-theme="dark"] .card-signin input[type="password"],:root[data-theme="dark"] .card-signin textarea{
+    color:#0b1220!important;
+    -webkit-text-fill-color:#0b1220!important;
+    caret-color:#0b1220!important;
+    background:#ffffff!important;
+    border-color:rgba(0,0,0,0.12)!important
+}
+:root[data-theme="dark"] .card-signin .form-control::placeholder,:root[data-theme="dark"] .card-signin textarea::placeholder{
+    color:rgba(11,18,32,0.35)!important
 }
 
-/* Extra strong selector as fallback: target html[data-theme] as well */
-html[data-theme="dark"] .card-signin input.form-control,
-html[data-theme="dark"] .card-signin input[type="text"],
-html[data-theme="dark"] .card-signin input[type="password"],
-html[data-theme="dark"] .card-signin textarea {
-    color: #0b1220 !important;
-    -webkit-text-fill-color: #0b1220 !important;
-    caret-color: #0b1220 !important;
-    background: #ffffff !important;
-    border-color: rgba(0,0,0,0.12) !important;
+/* Autofill fixes for Chrome/Brave */
+:root[data-theme="dark"] .card-signin input:-webkit-autofill,:root[data-theme="dark"] .card-signin textarea:-webkit-autofill,:root[data-theme="dark"] .card-signin select:-webkit-autofill,:root[data-theme="dark"] input:-webkit-autofill,:root[data-theme="dark"] textarea{
+    -webkit-box-shadow:0 0 0 1000px #ffffff inset!important;
+    box-shadow:0 0 0 1000px #ffffff inset!important;
+    -webkit-text-fill-color:#0b1220!important;
+    caret-color:#0b1220!important
 }
 
-/* Also make theme-toggle button clearly visible in offcanvas/dark mode */
-:root[data-theme="dark"] .offcanvas .theme-toggle {
-    background: rgba(255,255,255,0.04);
-    color: var(--lux-nav-text);
-    border-color: rgba(255,255,255,0.06);
+html[data-theme="dark"] .card-signin input.form-control,html[data-theme="dark"] .card-signin input[type="text"],html[data-theme="dark"] .card-signin input[type="password"],html[data-theme="dark"] .card-signin textarea{
+    color:#0b1220!important;
+    -webkit-text-fill-color:#0b1220!important;
+    caret-color:#0b1220!important;
+    background:#ffffff!important;
+    border-color:rgba(0,0,0,0.12)!important
 }
+
+:root[data-theme="dark"] .offcanvas .theme-toggle{
+    background:rgba(255,255,255,0.04);
+    color:var(--lux-nav-text);
+    border-color:rgba(255,255,255,0.06)
+}
+

@@ -20,8 +20,14 @@ class OrderController extends BaseController
     public function index(Request $request): Response
     {
         // Load services for select (1:N relationship: service -> many orders)
-        $services = Service::getAll(orderBy: '`name` ASC');
-        return $this->html(compact('services'));
+        $services = [];
+        try {
+            $services = Service::getAll(orderBy: '`name` ASC');
+        } catch (\Throwable $e) {
+            $services = [];
+        }
+        // Render the existing Home/order view
+        return $this->html(compact('services'), 'Home/order');
     }
 
     /**
@@ -36,11 +42,16 @@ class OrderController extends BaseController
         if ($startTs === false) return true;
         $endTs = $startTs + ($durationMinutes * 60);
 
-        $orders = Order::getAll('`date` = ?', [$date]);
+        try {
+            $orders = Order::getAll('`date` = ?', [$date]);
+        } catch (\Throwable $e) {
+            // On DB error, treat as overlapping to be safe
+            return true;
+        }
+
         foreach ($orders as $o) {
             $t = (string)($o->time ?? '');
             if ($t === '') continue;
-            // assume stored as HH:MM:SS
             $existingStart = strtotime($date . ' ' . $t);
             if ($existingStart === false) continue;
             $existingEnd = $existingStart + ($durationMinutes * 60);
@@ -83,7 +94,12 @@ class OrderController extends BaseController
         }
 
         $timeDb = $time . ':00';
-        $available = !$this->hasOverlap($date, $timeDb, 60);
+
+        try {
+            $available = !$this->hasOverlap($date, $timeDb, 60);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['ok' => false, 'available' => false, 'error' => 'Chyba pri overovaní dostupnosti.'], 500);
+        }
 
         return new JsonResponse([
             'ok' => true,
@@ -146,14 +162,21 @@ class OrderController extends BaseController
 
         $timeDb = $time . ':00';
 
-        // Collision check: 60-min block overlap on same date
-        if ($this->hasOverlap($date, $timeDb, 60)) {
-            $errors['time'] = 'Tento termín je už obsadený. Vyberte iný.';
+        try {
+            if ($this->hasOverlap($date, $timeDb, 60)) {
+                $errors['time'] = 'Tento termín je už obsadený. Vyberte iný.';
+                if ($request->isAjax()) {
+                    return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
+                }
+                $services = Service::getAll(orderBy: '`name` ASC');
+                return $this->html(['errors' => $errors, 'old' => $request->post(), 'services' => $services], 'Home/order');
+            }
+        } catch (\Throwable $e) {
             if ($request->isAjax()) {
-                return new JsonResponse(['ok' => false, 'errors' => $errors], 422);
+                return new JsonResponse(['ok' => false, 'error' => 'Chyba pri overovaní dostupnosti: ' . $e->getMessage()], 500);
             }
             $services = Service::getAll(orderBy: '`name` ASC');
-            return $this->html(['errors' => $errors, 'old' => $request->post(), 'services' => $services], 'Home/order');
+            return $this->html(['error' => 'Chyba pri overovaní dostupnosti.', 'old' => $request->post(), 'services' => $services], 'Home/order');
         }
 
         $order = new Order();
@@ -210,22 +233,174 @@ class OrderController extends BaseController
             return new JsonResponse(['ok' => false, 'error' => 'Neplatný dátum/čas.'], 400);
         }
 
-        // Search forward in 60-minute steps, up to 30 days
-        $limitSteps = 24 * 30;
-        $ts = $startTs;
-        for ($i = 0; $i < $limitSteps; $i++) {
-            $d = date('Y-m-d', $ts);
-            $t = date('H:i:s', $ts);
-            if (!$this->hasOverlap($d, $t, 60)) {
-                return new JsonResponse([
-                    'ok' => true,
-                    'date' => $d,
-                    'time' => substr($t, 0, 5)
-                ]);
+        try {
+            $limitSteps = 24 * 30;
+            $ts = $startTs;
+            for ($i = 0; $i < $limitSteps; $i++) {
+                $d = date('Y-m-d', $ts);
+                $t = date('H:i:s', $ts);
+                if (!$this->hasOverlap($d, $t, 60)) {
+                    return new JsonResponse([
+                        'ok' => true,
+                        'date' => $d,
+                        'time' => substr($t, 0, 5)
+                    ]);
+                }
+                $ts += 3600;
             }
-            $ts += 3600;
+        } catch (\Throwable $e) {
+            return new JsonResponse(['ok' => false, 'error' => 'Chyba pri vyhľadávaní voľného termínu.'], 500);
         }
 
         return new JsonResponse(['ok' => true, 'date' => null, 'time' => null, 'reason' => 'V najbližších 30 dňoch sa nenašiel voľný termín.']);
+    }
+
+    // Diagnostic endpoint for DB/schema debugging (safe for local dev)
+    public function diag(Request $request): Response
+    {
+        if (!$this->user->isLoggedIn()) {
+            // restrict detailed diag to admins
+            return $this->json(['ok' => false, 'error' => 'Unauthorized'], 403);
+        }
+
+        try {
+            $ordersCols = Order::executeRawSQL('DESCRIBE orders');
+        } catch (\Throwable $e) {
+            $ordersCols = ['error' => $e->getMessage()];
+        }
+
+        try {
+            $servicesCols = Service::executeRawSQL('DESCRIBE services');
+        } catch (\Throwable $e) {
+            $servicesCols = ['error' => $e->getMessage()];
+        }
+
+        return $this->json(['ok' => true, 'orders' => $ordersCols, 'services' => $servicesCols]);
+    }
+
+    // Admin CRUD: list orders
+    public function adminList(Request $request): Response
+    {
+        // require admin (simple check)
+        if (!$this->user->isLoggedIn()) {
+            return $this->redirect($this->url('auth.login'));
+        }
+
+        $page = max(1, (int)($request->value('page') ?? 1));
+        $perPage = (int)($request->value('per_page') ?? 15);
+        if ($perPage <= 0) $perPage = 15;
+        if ($perPage > 100) $perPage = 100;
+
+        try {
+            $total = Order::getCount();
+        } catch (\Throwable $e) {
+            $total = 0;
+        }
+        $offset = ($page - 1) * $perPage;
+        try {
+            $orders = Order::getAll(null, [], '`created_at` DESC', $perPage, $offset);
+        } catch (\Throwable $e) {
+            $orders = [];
+        }
+
+        $totalPages = $perPage > 0 ? max(1, (int)ceil($total / $perPage)) : 1;
+
+        return $this->html(compact('orders', 'page', 'perPage', 'total', 'totalPages'), 'Admin/order');
+    }
+
+    // Admin edit (GET shows form, POST saves)
+    public function edit(Request $request): Response
+    {
+        if (!$this->user->isLoggedIn()) {
+            return $this->redirect($this->url('auth.login'));
+        }
+
+        $id = (int)($request->value('id') ?? 0);
+        if ($id <= 0) {
+            return $this->redirect($this->url('admin.orders'));
+        }
+
+        $order = Order::getOne($id);
+        if (!$order) {
+            return $this->redirect($this->url('admin.orders'));
+        }
+
+        $services = Service::getAll(orderBy: '`name` ASC');
+
+        if ($request->isPost()) {
+            // Debug logging: record that edit POST arrived and some key params
+            try { error_log('[DEBUG] OrderController::edit POST id=' . $id . ' ajax=' . ($request->isAjax() ? '1' : '0') . ' data=' . json_encode($request->post())); } catch (\Throwable $e) {}
+
+            $order->first_name = trim((string)$request->value('first_name')) ?: $order->first_name;
+            $order->last_name = trim((string)$request->value('last_name')) ?: $order->last_name;
+            $email = trim((string)$request->value('email'));
+            if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $order->email = $email;
+            }
+            $order->phone = trim((string)$request->value('phone')) ?: $order->phone;
+
+            $serviceId = (int)($request->value('service_id') ?? 0);
+            if ($serviceId > 0) {
+                $svc = Service::getOne($serviceId);
+                if ($svc) {
+                    $order->service_id = $serviceId;
+                    $order->service = (string)($svc->name ?? $order->service);
+                }
+            }
+
+            $date = trim((string)$request->value('date'));
+            if ($date !== '') {
+                $order->date = $date;
+            }
+            $time = trim((string)$request->value('time'));
+            if ($time !== '') {
+                if (preg_match('/^\d{2}:\d{2}$/', $time)) {
+                    $time .= ':00';
+                }
+                $order->time = $time;
+            }
+            $notes = $request->value('notes');
+            $order->notes = ($notes === '' ? null : $notes);
+
+            $order->save();
+            if ($request->isAjax() || $request->wantsJson()) {
+                return $this->json(['ok' => true, 'id' => $order->id]);
+            }
+            return $this->redirect($this->url('admin.orders'));
+        }
+
+        return $this->html(['order' => $order, 'services' => $services], 'Admin/edit');
+    }
+
+    // Admin update alias (CRUD-style): keep update() as alias to edit() POST handling
+    public function update(Request $request): Response
+    {
+        return $this->edit($request);
+    }
+
+    // Admin delete
+    public function delete(Request $request): Response
+    {
+        try { error_log('[DEBUG] OrderController::delete called method=' . ($request->isPost() ? 'POST' : 'GET') . ' ajax=' . ($request->isAjax() ? '1' : '0') . ' params=' . json_encode($request->post() ?: $request->get())); } catch (\Throwable $e) {}
+        if (!$this->user->isLoggedIn()) {
+            return $this->redirect($this->url('auth.login'));
+        }
+        if (!$request->isPost()) {
+            return $this->redirect($this->url('admin.orders'));
+        }
+
+        $id = (int)($request->value('id') ?? 0);
+        if ($id > 0) {
+            $order = Order::getOne($id);
+            if ($order) {
+                $order->delete();
+            }
+        }
+
+        if ($request->isAjax() || $request->wantsJson()) {
+            return $this->json(['ok' => true, 'id' => $id]);
+        }
+
+        return $this->redirect($this->url('admin.orders'));
     }
 }

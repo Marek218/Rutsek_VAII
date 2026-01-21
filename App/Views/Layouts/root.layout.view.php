@@ -63,10 +63,10 @@
                 <a class="nav-link" href="<?= $link->url('home.services') ?>">Služby a cenník</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a>
+                <a class="nav-link" href="<?= $link->url('gallery.index') ?>">Galéria</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= $link->url('home.order') ?>">Rezervácia</a>
+                <a class="nav-link" href="<?= $user->isLoggedIn() ? $link->url('admin.orders') : $link->url('order.index') ?>">Rezervácia</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a>
@@ -114,8 +114,8 @@
     <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.index') ?>">Domov</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.services') ?>">Služby a cenník</a></li>
-      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.gallery') ?>">Galéria</a></li>
-      <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.order') ?>">Rezervácia</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $link->url('gallery.index') ?>">Galéria</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= $user->isLoggedIn() ? $link->url('admin.orders') : $link->url('order.index') ?>">Rezervácia</a></li>
       <li class="nav-item"><a class="nav-link" href="<?= $link->url('home.contact') ?>">Kontakt</a></li>
     </ul>
     <hr>

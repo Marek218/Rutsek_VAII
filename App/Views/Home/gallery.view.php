@@ -6,6 +6,8 @@
 /** @var bool $isAdmin */
 /** @var string $flash */
 
+use App\Models\Gallery;
+
 $galleryItems = $galleryItems ?? [];
 $galleryError = $galleryError ?? null;
 $isAdmin = $isAdmin ?? false;
@@ -24,52 +26,6 @@ $flashMessages = [
 
 $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
 
-/**
- * Normalize DB value (path_url) into a path relative to public/.
- * Accepts values like:
- *  - images/Gallery/panske1.png
- *  - /images/Gallery/panske1.png
- *  - public/images/Gallery/panske1.png
- *  - images/Gallery/panske1   (no extension)
- */
-$normalizePathUrl = function (?string $raw) {
-    $path = trim((string)$raw);
-    if ($path === '') {
-        return null;
-    }
-
-    // Decode HTML entities just in case
-    $path = html_entity_decode($path, ENT_QUOTES | ENT_HTML5);
-
-    // Make it relative
-    $path = ltrim($path, "/\\");
-
-    // If someone stored filesystem-ish prefix
-    if (stripos($path, 'public/') === 0) {
-        $path = substr($path, strlen('public/'));
-        $path = ltrim($path, "/\\");
-    }
-
-    // Normalize slashes for URL
-    $path = str_replace('\\', '/', $path);
-
-    // If no extension, try to find existing file under public/ with common image extensions
-    if (!preg_match('~\.(png|jpe?g|webp|gif)$~i', $path)) {
-        $publicDir = realpath(__DIR__ . '/../../public');
-        if ($publicDir !== false) {
-            foreach (['.jpg', '.png', '.jpeg', '.webp'] as $ext) {
-                $candidate = rtrim($publicDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path . $ext);
-                if (is_file($candidate)) {
-                    return str_replace('\\', '/', $path . $ext);
-                }
-            }
-        }
-        // fallback: return with .jpg so browser can still try to load something
-        return $path . '.jpg';
-    }
-
-    return $path;
-};
 ?>
 
 <div class="row mb-4">
@@ -98,14 +54,13 @@ $normalizePathUrl = function (?string $raw) {
                 ?></div>
             <?php } ?>
 
-            <form method="post" action="<?= $link->url('home.gallery') ?>" enctype="multipart/form-data" class="row g-3">
+            <form method="post" action="<?= $link->url('gallery.admin') ?>" enctype="multipart/form-data" class="row g-3">
                 <input type="hidden" name="mode" value="upload">
                 <div class="col-12">
                     <label class="form-label">Obrázok (PNG/JPG)</label>
                     <div class="d-flex gap-2 align-items-center flex-wrap">
                         <input type="file" name="image" accept="image/png,image/jpeg" class="form-control form-control-file" required>
                         <button type="submit" class="btn btn-primary">Nahrať</button>
-                        <span class="text-muted small">Súbor sa uloží do <code>public/uploads/gallery</code> a do DB do <code>path_url</code>.</span>
                     </div>
                 </div>
             </form>
@@ -130,10 +85,10 @@ $normalizePathUrl = function (?string $raw) {
         id="galleryGrid"
         <?= $isAdmin ? ' data-admin-reorder="1"' : '' ?>
         data-gallery-grid
-        <?= $isAdmin ? (' data-reorder-endpoint="' . htmlspecialchars($link->url('home.gallery')) . '" data-reorder-redirect="' . htmlspecialchars($link->url('home.gallery', ['flash' => 'ok'])) . '"') : '' ?>
+        <?= $isAdmin ? (' data-reorder-endpoint="' . htmlspecialchars($link->url('gallery.admin')) . '" data-reorder-redirect="' . htmlspecialchars($link->url('gallery.admin', ['flash' => 'ok'])) . '"') : '' ?>
     >
         <?php foreach ($galleryItems as $item) {
-            $path = $normalizePathUrl($item->path_url ?? null);
+            $path = Gallery::normalizePathUrl($item->path_url ?? null);
             if ($path === null) {
                 continue;
             }
@@ -154,7 +109,7 @@ $normalizePathUrl = function (?string $raw) {
 
                 <?php if ($isAdmin) { ?>
                     <form method="post"
-                          action="<?= $link->url('home.gallery') ?>"
+                          action="<?= $link->url('gallery.admin') ?>"
                           class="gallery-admin-delete"
                           onsubmit="return confirm('Naozaj odstrániť tento obrázok?');">
                         <input type="hidden" name="mode" value="delete">
@@ -216,10 +171,8 @@ $normalizePathUrl = function (?string $raw) {
 </div>
 
 <?php if ($isAdmin && $debug) {
-    $logFile = realpath(__DIR__ . '/../../var/log/upload_errors.log');
-    if ($logFile && is_file($logFile) && is_readable($logFile)) {
-        $lines = @file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-        $last = array_slice($lines, -40);
+    $last = Gallery::getUploadLogLines();
+    if (!empty($last)) {
         echo '<div class="alert alert-secondary"><strong>Debug – posledné záznamy upload_errors.log:</strong><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;padding:0.5rem;margin-top:.5rem;">' . htmlspecialchars(implode("\n", $last)) . '</pre></div>';
     } else {
         echo '<div class="alert alert-secondary"><strong>Debug:</strong> upload_errors.log nenájdený (uistite sa, že adresár var/log existuje a má zápis).</div>';

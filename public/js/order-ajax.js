@@ -201,11 +201,13 @@
                 last_name: '#last_name',
                 email: '#email',
                 phone: '#phone',
-                service: '#service',
+                service_id: '#service_id',
                 date: '#date',
                 time: '#time',
                 notes: '#notes'
             };
+
+            var firstFocus = null;
 
             for (var key in errors) {
                 if (!Object.prototype.hasOwnProperty.call(errors, key)) continue;
@@ -218,7 +220,10 @@
                 div.setAttribute('data-ajax-error', '1');
                 div.textContent = String(errors[key]);
                 input.insertAdjacentElement('afterend', div);
+                if (!firstFocus) { firstFocus = input; }
             }
+
+            if (firstFocus && typeof firstFocus.focus === 'function') { try { firstFocus.focus(); } catch(e) {} }
         }
 
         function showTopAlert(message, tone) {

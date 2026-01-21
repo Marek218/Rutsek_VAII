@@ -21,7 +21,7 @@ $errors = $errors ?? [];
         <div class="alert alert-danger"><?= htmlspecialchars($errors['form']) ?></div>
     <?php } ?>
 
-    <form method="post" action="<?= $link->url('admin.contact') ?>" class="row g-3">
+    <form method="post" action="<?= $link->url('contactInfo.edit') ?>" class="row g-3">
         <div class="col-md-6">
             <label class="form-label" for="salon_name">Názov salónu</label>
             <input id="salon_name" name="salon_name" class="form-control<?= !empty($errors['salon_name']) ? ' is-invalid' : '' ?>" value="<?= htmlspecialchars((string)($contact->salon_name ?? '')) ?>" required>

@@ -1,15 +1,15 @@
 /* footer.css - štýly pre pätičku (footer) */
 
 .site-footer {
-    padding: 0.6rem 0; /* even smaller vertical padding */
-    margin-top: 0.8rem; /* reduce space above footer */
+    padding: 0.6rem 0;
+    margin-top: 0.8rem;
     font-size: 0.92rem;
 }
 
 .site-footer .container > .row {
     display: flex;
-    flex-wrap: nowrap; /* prefer side-by-side on wide screens */
-    align-items: center; /* vertical centering of columns */
+    flex-wrap: nowrap;
+    align-items: center;
     gap: 0.75rem 2rem;
 }
 
@@ -19,8 +19,8 @@
     justify-content: center;
     padding-top: 0.15rem;
     padding-bottom: 0.15rem;
-    flex: 1 1 0; /* distribute columns evenly */
-    min-width: 200px; /* allow wrapping on narrow screens */
+    flex: 1 1 0;
+    min-width: 200px;
 }
 
 .site-footer h5 {
@@ -33,18 +33,52 @@
     font-size: 0.82rem;
 }
 
-.site-footer .list-unstyled { margin: 0; padding: 0; }
-.site-footer .list-unstyled li { margin-bottom: 0.18rem; }
-.site-footer .footer-link { text-decoration: none; font-size: 0.88rem; }
-.site-footer .footer-link:hover { text-decoration: underline; }
-.site-footer .footer-separator { border: none; margin: 0.45rem 0; }
-.site-footer .footer-copy { font-size: 0.76rem; padding: 0.15rem 0 0 0; }
+.site-footer .list-unstyled {
+    margin: 0;
+    padding: 0;
+}
+
+.site-footer .list-unstyled li {
+    margin-bottom: 0.18rem;
+}
+
+.site-footer .footer-link {
+    text-decoration: none;
+    font-size: 0.88rem;
+}
+
+.site-footer .footer-link:hover {
+    text-decoration: underline;
+}
+
+.site-footer .footer-separator {
+    border: none;
+    margin: 0.45rem 0;
+}
+
+.site-footer .footer-copy {
+    font-size: 0.76rem;
+    padding: 0.15rem 0 0 0;
+}
 
 @media (max-width: 900px) {
-    .site-footer .container > .row { flex-wrap: wrap; }
+    .site-footer .container > .row {
+        flex-wrap: wrap;
+    }
 }
+
 @media (max-width: 767px) {
-    .site-footer { padding: 0.6rem 0; }
-    .site-footer .container > .row { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
-    .site-footer .col-md-4 { width: 100%; }
+    .site-footer {
+        padding: 0.6rem 0;
+    }
+
+    .site-footer .container > .row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .site-footer .col-md-4 {
+        width: 100%;
+    }
 }

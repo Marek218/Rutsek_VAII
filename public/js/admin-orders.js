@@ -1,8 +1,15 @@
 // public/js/admin-orders.js
 // - Sorting for the admin orders table (Rezervácie)
+// - AJAX delete/edit handlers for admin actions
 
 (function () {
     'use strict';
+
+    function findClosest(el, selector) {
+        if (!el) return null;
+        if (el.nodeType === 3) el = el.parentElement;
+        return el.closest ? el.closest(selector) : null;
+    }
 
     function initAdminOrdersTable() {
         var table = document.querySelector('.table.table-striped.table-hover.align-middle');
@@ -113,8 +120,99 @@
         if (dateHeader) dateHeader.click();
     }
 
+    /* ---------- AJAX handlers for admin forms ---------- */
+    function ajaxDeleteHandler(e) {
+        var form = findClosest(e.target, 'form[data-ajax-delete-order]');
+        if (!form) return;
+        console.log('ajaxDeleteHandler triggered for form', form);
+        e.preventDefault();
+        if (!confirm('Naozaj chcete vymazať túto rezerváciu?')) return;
+
+        var action = form.getAttribute('action') || window.location.href;
+        var data = new URLSearchParams(new FormData(form)).toString();
+
+        fetch(action, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }, body: data, credentials: 'same-origin' })
+            .then(function (res) {
+                return res.text().then(function (txt) {
+                    try { return JSON.parse(txt); } catch (e) { throw new Error('Invalid JSON: ' + txt); }
+                });
+            })
+            .then(function (json) {
+                if (json && json.ok) {
+                    // remove row
+                    var row = findClosest(form, 'tr');
+                    if (row && row.parentNode) row.parentNode.removeChild(row);
+                } else {
+                    console.error('Delete response not OK', json);
+                    // fallback to normal submit
+                    form.removeAttribute('data-ajax-delete-order');
+                    form.submit();
+                }
+            }).catch(function (err) {
+                console.error('AJAX delete failed', err);
+                // fallback to normal submit
+                form.removeAttribute('data-ajax-delete-order');
+                form.submit();
+            });
+    }
+
+    // Click handler for delete buttons to ensure AJAX triggers even if form submission is interfered
+    function deleteButtonClickHandler(e) {
+        var btn = e.target.closest && e.target.closest('button[type="submit"]');
+        if (!btn) return;
+        var form = findClosest(btn, 'form[data-ajax-delete-order]');
+        if (!form) return;
+        e.preventDefault();
+        // delegate to ajaxDeleteHandler by dispatching submit event
+        var ev = new Event('submit', { bubbles: true, cancelable: true });
+        form.dispatchEvent(ev);
+    }
+
+    function ajaxEditHandler(e) {
+        var form = findClosest(e.target, 'form[data-ajax-edit-order]');
+        if (!form) return;
+        e.preventDefault();
+
+        var action = form.getAttribute('action') || window.location.href;
+        var data = new URLSearchParams(new FormData(form)).toString();
+        var submitBtn = form.querySelector('button[type="submit"]');
+        var origText = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Ukladám...'; }
+
+        fetch(action, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }, body: data, credentials: 'same-origin' })
+            .then(function (res) {
+                return res.text().then(function (txt) {
+                    try { return JSON.parse(txt); } catch (e) { throw new Error('Invalid JSON: ' + txt); }
+                });
+            })
+            .then(function (json) {
+                if (json && json.ok) {
+                    // on success redirect to list to see updated entries
+                    window.location.href = window.location.pathname + '?c=admin&a=orders';
+                } else {
+                    console.error('Edit response not OK', json);
+                    // fallback to normal submit
+                    form.removeAttribute('data-ajax-edit-order');
+                    form.submit();
+                }
+            }).catch(function (err) {
+                console.error('AJAX edit failed', err);
+                // fallback to normal submit
+                form.removeAttribute('data-ajax-edit-order');
+                form.submit();
+            })
+            .finally(function () { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = origText; } });
+    }
+
+    function attachAjaxHandlers() {
+        document.addEventListener('submit', ajaxDeleteHandler, true);
+        document.addEventListener('submit', ajaxEditHandler, true);
+        document.addEventListener('click', deleteButtonClickHandler, true);
+    }
+
     function init() {
         initAdminOrdersTable();
+        attachAjaxHandlers();
     }
 
     if (document.readyState === 'loading') {

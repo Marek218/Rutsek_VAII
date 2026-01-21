@@ -15,7 +15,7 @@ $services = $services ?? [];
         </div>
     </div>
 
-    <form method="post" action="<?= $link->url('admin.edit', ['id' => $order->id]) ?>" class="row g-3">
+    <form method="post" action="<?= $link->url('order.update', ['id' => $order->id]) ?>" class="row g-3" data-ajax-edit-order>
         <div class="col-md-6">
             <label class="form-label" for="first_name">Meno</label>
             <input id="first_name" type="text" name="first_name" class="form-control" value="<?= htmlspecialchars($order->first_name ?? '') ?>">

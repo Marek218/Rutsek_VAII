@@ -16,7 +16,6 @@ $flash = $flash ?? '';
         <div class="col">
             <h2>Úvodná stránka – okienka</h2>
             <p class="text-muted mb-0">Tu vieš upraviť texty v okienkach na úvodnej stránke.</p>
-            <a class="btn btn-link p-0" href="<?= $link->url('admin.index') ?>">← Späť do administrácie</a>
         </div>
     </div>
 

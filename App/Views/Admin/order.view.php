@@ -50,8 +50,8 @@ $orders = $orders ?? [];
                     <td><?= htmlspecialchars($o->date ?? '') ?></td>
                     <td><?= htmlspecialchars(substr((string)$o->time, 0, 5)) ?></td>
                     <td class="text-end">
-                        <a class="btn btn-sm btn-primary" href="<?= $link->url('Admin.edit', ['id' => $o->id]) ?>">Upraviť</a>
-                        <form action="<?= $link->url('Admin.delete') ?>" method="post" class="d-inline" onsubmit="return confirm('Naozaj chcete vymazať túto rezerváciu?');">
+                        <a class="btn btn-sm btn-primary" href="<?= $link->url('order.edit', ['id' => $o->id]) ?>">Upraviť</a>
+                        <form action="<?= $link->url('order.delete', ['id' => $o->id]) ?>" method="post" class="d-inline" data-ajax-delete-order onsubmit="return confirm('Naozaj chcete vymazať túto rezerváciu?');">
                             <input type="hidden" name="id" value="<?= (int)$o->id ?>">
                             <button type="submit" class="btn btn-sm btn-outline-danger">Vymazať</button>
                         </form>

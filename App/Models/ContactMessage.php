@@ -22,4 +22,27 @@ class ContactMessage extends Model
     public int $is_read = 0;
 
     public ?string $created_at = null;
+
+    public static function all(): array
+    {
+        return parent::getAll(null, [], '`created_at` DESC');
+    }
+
+    public static function create(array $data): int
+    {
+        $m = new self();
+        $m->name = (string)($data['name'] ?? '');
+        $m->phone = (string)($data['phone'] ?? '');
+        $m->email = (string)($data['email'] ?? '');
+        $m->subject = $data['subject'] ?? null;
+        $m->message = (string)($data['message'] ?? '');
+        $m->ip = $data['ip'] ?? null;
+        $m->user_agent = $data['user_agent'] ?? null;
+        $m->is_read = (int)($data['is_read'] ?? 0);
+        $now = date('Y-m-d H:i:s');
+        $m->created_at = $now;
+        $m->save();
+        return (int)$m->id;
+    }
+
 }

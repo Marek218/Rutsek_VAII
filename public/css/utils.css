@@ -1,97 +1,102 @@
-/* utils.css - pomocné triedy a responzívne utility */
-
-/* Minimal project-specific utilities (Bootstrap already provides most utilities). */
-
-/* Sort indicator in table headers */
-th.sortable { position: relative; }
-th.sortable .sort-indicator {
-    display: inline-block;
-    margin-left: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--lux-muted);
+/* Full fallback theme tokens to make utils.css self-contained for static analysis */
+:root{
+    --lux-accent: #ff6b9e;
+    --lux-accent-2: #c85472;
+    --lux-bg: #ffffff;
+    --lux-surface: #ffffff;
+    --lux-text: #2b2b2b;
+    --lux-muted: #6b3d4f;
+    --lux-border: rgba(0,0,0,0.08);
+    --lux-nav-bg: #ffffff;
+    --lux-nav-text: #2b2b2b;
+    --lux-btn-bg: var(--lux-accent);
+    --lux-btn-text: #ffffff;
+    --lux-footer-bg: #f9e9ec;
+    --lux-footer-text: #4a2b2b;
+    --lux-input-bg: #ffffff;
+    --lux-input-text: #2b2b2b;
+    --lux-input-border: rgba(0,0,0,0.10);
+    --lux-input-focus: rgba(255,107,158,0.18);
+    --lux-link: #6b3d4f;
+    --lux-link-hover: #c85472;
+    --lux-contact-link: var(--lux-link);
+    --lux-table-text: var(--lux-text);
+    --lux-table-head-bg: rgba(0,0,0,0.03);
+    --lux-table-head-text: var(--lux-text);
+    --lux-table-border: var(--lux-border);
+    --lux-table-row-even: rgba(0,0,0,0.00);
+    --lux-table-row-even-2: rgba(0,0,0,0.015);
+    --lux-table-hover: rgba(0,0,0,0.03);
 }
 
-th.sortable:not([data-order]) { opacity: 0.85; }
-th.sortable[data-order="asc"],
-th.sortable[data-order="desc"] { font-weight: 600; }
+/* utils.css - essential utilities (trimmed) */
 
-/* Admin tables: horizontal scroll on small screens */
-@media (max-width: 768px) {
-    .admin-table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    .admin-table-responsive .table { min-width: 680px; }
+/* Enhanced admin table wrapper: allow both horizontal and vertical scrolling when needed */
+.admin-table-responsive{
+    overflow:auto; /* allow both x and y scrolling */
+    -webkit-overflow-scrolling:touch;
+    max-height:65vh; /* vertical space cap; adjust if needed */
+    display:block; /* ensure it's a scroll container */
+    position: relative; /* Ensure admin table container establishes stacking context */
 }
+/* Allow table to grow horizontally beyond container so horizontal scrollbar appears when needed */
+.admin-table-responsive > .table,
+.admin-table-responsive .table{
+    /* On wide screens the table fills the container; on narrow screens min-width forces overflow */
+    width: 100% !important;
+    min-width: 680px; /* sensible minimum; causes horizontal scroll on small viewports */
+    margin-bottom:0;
+    table-layout: auto;
+    background: transparent; /* Make table background transparent so container bg shows only where cells are absent */
+}
+
+/* Sticky header so header remains visible while scrolling vertically */
+.admin-table-responsive thead th{
+    position:sticky;
+    top:0;
+    z-index:3;
+    background:var(--lux-table-head-bg, rgba(255,255,255,0.98));
+    color:var(--lux-table-head-text, var(--lux-text));
+}
+
+/* Sort indicator */
+th.sortable{position:relative}
+th.sortable .sort-indicator{display:inline-block;margin-left:.5rem;font-size:.9rem;color:var(--lux-muted, #6b3d4f)}
+
+/* Admin tables: responsive horizontal scroll on small screens (kept for compatibility) */
+@media (max-width:768px){.admin-table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch}.admin-table-responsive .table{min-width:680px}}
 
 /* Contact layout */
-.contact-phone { color: var(--lux-accent); font-weight: 600; }
-.contact-meta a { color: var(--lux-contact-link); text-decoration: none; }
-.contact-meta a:hover { color: var(--lux-link-hover); text-decoration: underline; }
-.btn-call { border-radius: 8px; padding: 0.45rem 0.85rem; }
+.contact-phone{color:var(--lux-accent, #ff6b9e);font-weight:600}
+.contact-meta a{color:var(--lux-contact-link, #6b3d4f);text-decoration:none}
+.contact-meta a:hover{color:var(--lux-link-hover, #c85472);text-decoration:underline}
+.btn-call{border-radius:8px;padding:.45rem .85rem}
 
-.contact-left .card,
-.contact-right .card,
-.contact-form-card .card {
-    background: var(--lux-surface) !important;
-    color: var(--lux-text);
-    border: 1px solid var(--lux-border);
-}
+.contact-left .card,.contact-right .card,.contact-form-card .card{background:var(--lux-surface, #ffffff)!important;color:var(--lux-text, #2b2b2b);border:1px solid var(--lux-border, rgba(0,0,0,0.08))}
 
-.contact-left .text-muted { color: var(--lux-muted) !important; }
+.contact-grid{display:grid;gap:1rem;grid-template-columns:1fr;align-items:stretch}
+@media (min-width:880px){.contact-grid{grid-template-columns:420px 1fr}}
+.contact-form-card{margin-top:1.25rem}
 
-:root[data-theme="dark"] .contact-left .card-body {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
+/* Tables: readability */
+.table{color:var(--lux-table-text, #2b2b2b)}
+:root[data-theme="dark"] .table{color:var(--lux-table-text, #eef1ff)!important}
 
-.contact-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-    align-items: stretch;
-}
-@media (min-width: 880px) {
-    .contact-grid { grid-template-columns: 420px 1fr; }
-}
+.table thead th{background:var(--lux-table-head-bg, rgba(0,0,0,0.03));color:var(--lux-table-head-text, #2b2b2b);border-bottom-color:var(--lux-table-border, rgba(0,0,0,0.08))!important}
+.table > :not(caption) > * > *{border-color:var(--lux-table-border, rgba(0,0,0,0.08))!important}
+.table tbody > tr > *{background:var(--lux-table-row-even, rgba(0,0,0,0))}
+.table-striped > tbody > tr:nth-of-type(odd) > *{background:var(--lux-table-row-even-2, rgba(0,0,0,0.015))}
+.table-hover > tbody > tr:hover > *{background:var(--lux-table-hover, rgba(0,0,0,0.03))!important}
 
-.contact-form-card { margin-top: 1.25rem; }
+/* Ensure table-card combined with admin-table-responsive allows scrolling (override earlier overflow:hidden) */
+.table-card.admin-table-responsive { overflow: auto !important; }
 
-/* Tables: readability + card wrapper */
-.table { color: var(--lux-table-text); }
+.table-card{border:1px solid var(--lux-table-border, rgba(0,0,0,0.08));border-radius:14px;overflow:hidden;background:var(--lux-surface, #ffffff)}
+.table-card .table{margin-bottom:0}
+.table a{color:var(--lux-link, #6b3d4f)}
+.table a:hover{color:var(--lux-link-hover, #c85472)}
 
-:root[data-theme="dark"] .table,
-:root[data-theme="dark"] .table td,
-:root[data-theme="dark"] .table th {
-    color: var(--lux-table-text) !important;
-}
+/* Ensure action buttons are above potential overlays and accept pointer events */
+.admin-table-responsive .btn{ position: relative; z-index: 10; pointer-events: auto; }
 
-:root[data-theme="dark"] .table .text-muted { color: rgba(255,255,255,0.70) !important; }
-
-.table thead th {
-    background: var(--lux-table-head-bg);
-    color: var(--lux-table-head-text);
-    border-bottom-color: var(--lux-table-border) !important;
-}
-
-.table > :not(caption) > * > * { border-color: var(--lux-table-border) !important; }
-
-.table tbody > tr > * { background: var(--lux-table-row-even); }
-.table-striped > tbody > tr:nth-of-type(odd) > * { background: var(--lux-table-row-even-2); }
-
-.table-hover > tbody > tr:hover > * { background: var(--lux-table-hover) !important; }
-
-.table-card {
-    border: 1px solid var(--lux-table-border);
-    border-radius: 14px;
-    overflow: hidden;
-    background: var(--lux-surface);
-}
-
-:root[data-theme="dark"] .table-card {
-    background: rgba(12, 18, 32, 0.55);
-    box-shadow: 0 14px 40px rgba(0,0,0,0.35);
-}
-
-.table-card .table { margin-bottom: 0; }
-.table a { color: var(--lux-link); }
-.table a:hover { color: var(--lux-link-hover); }
+/* End of file */

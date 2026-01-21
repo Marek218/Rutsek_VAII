@@ -104,7 +104,7 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                     </div>
                 <?php } ?>
 
-                <form method="post" action="<?= $link->url('home.contact') ?>" class="contact-form" data-ajax-contact="1">
+                <form method="post" action="<?= $link->url('message.store') ?>" class="contact-form" data-ajax-contact="1">
                     <!-- Honeypot anti-spam: musí zostať prázdne -->
                     <label>
                         <input type="text" name="website" value="" style="position:absolute;left:-9999px;top:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -120,6 +120,14 @@ $ciOpening = $contactInfo?->opening_hours ?? "Pondelok – Piatok: 08:00 – 18:
                             <label for="contact-email" class="form-label">Email</label>
                             <input id="contact-email" type="email" name="email" class="form-control<?= !empty($errors['email']) ? ' is-invalid' : '' ?>" value="<?= htmlspecialchars((string)($old['email'] ?? '')) ?>" required>
                             <?php if (!empty($errors['email'])) { ?><div class="invalid-feedback"><?= htmlspecialchars($errors['email']) ?></div><?php } ?>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="contact-phone" class="form-label">Telefón (voliteľné)</label>
+                            <input id="contact-phone" type="tel" name="phone" class="form-control" value="<?= htmlspecialchars((string)($old['phone'] ?? '')) ?>">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="contact-subject" class="form-label">Predmet (voliteľné)</label>
+                            <input id="contact-subject" type="text" name="subject" class="form-control" value="<?= htmlspecialchars((string)($old['subject'] ?? '')) ?>">
                         </div>
                         <div class="col-12">
                             <label for="contact-message" class="form-label">Správa</label>
